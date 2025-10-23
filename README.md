@@ -1,98 +1,98 @@
-# CFUCounter
+<img src="img1.png" alt="drawing" width="200"/>
 
-An application that counts colony-forming units in images of petri dishes. CFU Counter uses Mask R-CNN which is a
-state-of-the-art model for instance segmentation, developed on top of Faster R-CNN. The CNN was trained using the Agar dataset.
+# MaskRCNN based Pipeline for colonies detection and features extruction
 
-Mask R-CNN:
-https://github.com/matterport/Mask_RCNN
+Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a computer?!  Try our new agarCNN+! It's super robust and extremely slow. Just be patient and (maybe) it will find even the smallest colonies, extract their sizes and colours, and perform spatial clustering (in case you use the stripe technique for plating, but we do!).
 
-Agar Dataset:
-https://agar.neurosys.com/
+Made to improve and extend capabilities of:
 
-<p align="center">
-<img src="https://github.com/dedovskaya/CFUCounter/assets/71874540/a0e5cb34-1a12-4c3a-b23a-d6e56c894257" width=700>
-</p>
+https://github.com/dedovskaya/CFUCounter
 
-## Instructions:
-<ol>
-<li><b>Download .h5 file from this link</b>: https://drive.google.com/file/d/19-mxrjV_EeSQAb7SppIVG_vgjse_pP7u/view?usp=sharing</li>
-  
-<li>Put .h5 file to <b>"agar_cfg20221010T2320"</b> folder</li>
+**Main improvments:**
+- detection of small colonies
+- features extraction
+- stripes segmentation (for stripes plating method)
 
-<li>Create an environment with <b>Python 3.6.3</b> and install dependencies with the following commands in terminal/powershell:</li>
+**Affilation:**
 
-<ol>
-  <li>conda create -n agarrcnn python=3.6.3</li>
+University of Innsbruck, Institute of Microbiology, Environmental OMICS group
 
-  <li>conda activate agarrcnn</li>
+https://www.uibk.ac.at/de/microbiology/forschen/alpine-umweltmikrobiologie/environmental-omics-e-omics/
 
-  <li>pip install -r requirements.txt</li>
-</ol>
-</ol>
+CEDRIC project 
 
-## To run the application:
+https://cedricproject.eu/
 
-python cfucounter.py
+# How to install?
+1. Download: Code > Download ZIP
+2. Unpack
+3. Download .h5 file from this link: https://drive.google.com/file/d/19-mxrjV_EeSQAb7SppIVG_vgjse_pP7u/view?usp=sharing
+4. Put .h5 file to "CFUCounter/agar_cfg20221010T2320" folder
+5. Download and install conda (if lacks): https://www.anaconda.com/download/success
+6. Open Anaconda Prompt
+7. Create a conda environment with Python 3.6.3:
 
-</div>
-<h2>Upload a file</h2>
-<ul><li><p>To upload a single image use the "Upload File" button.</p></li>
-    <li><p>To upload all images from a folder use the "Upload Folder" button.</p></li>
-</ul>
+&emsp;&emsp; *conda create -n agarrcnn python=3.6.3*
 
-<h2>Set configurations</h2>
-<ol>
-<li><p>Set <b>Number of Samples</b>, the maximum number of final detections. If you don't know the estimated number of colonies, leave this number high.</p></li>
-<li><p>Set <b>Detection Confidence</b>, minimum probability value to accept a detected instance. ROIs below this threshold are skipped. For the best results raise its value to 0.99. If you have a vague picture and you think that the application underestimates the number of colonies you can leave the default number or decrease it.</p></li>
-<p>Or just leave the default parameters.</p>
-</ol>
-<p>Hint: you can run the detection multiple times on the same image with different configuration parameters. All the input configuration parameters are saved in the output .csv table.</p>
-<h2>Run Detection</h2>
-<ul>
-<li>
-<p>Click <b>"Detect selected"</b> to detect colonies on the displayed image. The detection will be performed on the picture that is shown in the main window. To change the picture use arrow buttons near thumbnails of images.</p></li>
-<li><p>Click <b>"Detect all"</b> to detect colonies in all the uploaded images.</p></li>
-</ul>
-<h2>Export results</h2>
-<ul>
-<li><p>Click <b>"Export csv table"</b> after the detection process to save a table containing information: img name, number of colonies, bounding boxes (rectangles that surround colonies, that specify their position).</p>
-<p class="warning">Please always export the table before closing the application!</p>
-</li>
-<div class="table-wrapper">
-<table class="fl-table">
-    <thead>
-      <tr>
-        <th>Filename</th>
-        <th>Number of colonies</th>
-        <th>Bounding boxes</th>
-        <th>conf_numsamples</th>
-        <th>conf_det_confidence</th>
-        <th>Colonies per sector</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Filename</td>
-        <td>Number of detected colonies</td>
-        <td>Coordinates of colonies as boxes</td>
-        <td>Max. number of samples</td>
-        <td>Min. detection confidence</td>
-        <td>Number of colonies in each sector</td>
-      </tr>
-    </tbody>
-    </table>
-</div>
-<div class="sectors">
-<p>Sectors represent certain areas of the petri dish:</p>
-<img src="sectors_scheme.png" width='200px' alt="">
-</div>
-<li><p>Click <b>"Export image"</b> to save displayed image.</p></li>
-</ul>
-<h2>Information</h2>
-<p><b>Progress bar</b> shows percentage-wise progress of a current detection process. For a large number of images, it does not update itself consistently.</p>
-<p>In the bottom part of the application there is <b>log window</b> capturing all the events.</p>
-</body>
+&emsp;&emsp; *conda activate agarrcnn*
 
-## Author
-Ekaterina Baikova, TU Graz, 2022
+8. Install requirements: go to unpacked folder
 
+&emsp;&emsp; *pip install -r requirements.txt*
+
+# How to use?
+
+&emsp;&emsp; *python demo.py*
+
+test_data is used for the demo. Otherwise, specify the path to the folder containing the photos of plates. All other arguments are accessible through the CONFIG section of agarrcnn.py.
+
+After the initial preprocessing, the program halts allowing you to check the intermediate results. It's important, since the next step can be very time-consuming. Press 'y' if you are ready to continue and wait untill it's done.
+
+
+# Results
+Since the package is in development phase we save and visualize all relevant information for debuging. Results can be found in a dedicated folder inside original images folder.  Each photo of a plate results:
+
+### preprocessing
+ori_***.jpg -> original image
+
+cropped_***.jpg -> cropped image
+
+thr_***.jpg -> thresholded image(for proper spliting)
+
+splits_***/ -> folder with splits of image and possitioning file
+
+### colonies detection and feature extruction
+results_***.csv -> all numerical results see description below
+
+results_\*\*\*.png -> image of plates reconstructed by using data from results_***.csv
+
+### stripes detection
+***_kmean_plot.png -> results of kmean on pc1 stripes detection
+
+***_pol_plot.png -> results of fiting a mixture of polynomial regression
+
+### summary
+Can be find in the root folder *results/*
+
+all_results.csv
+validation.html -> comparison of demo-results (number of colonies) with validation values (manual counting)
+
+## Content of *results.csv*
+1. **Label:** colony index (sequence of natural numbers)
+2. **Rois:** coordinates of box inclosing colony 
+3. **Mask:** binary mask of colony
+4. **X,Y:** coordinates of center
+5. **Area:** area in pixels; derived from mask
+6. **R,G,B:** average colore of colony (masked region)
+7. **Stripe:** stripe according to initiial spliting
+8. **Stripe_Kmean:** according to k-means on PC1 clustering
+9. **Stripe_Polreg:** according to mixture of polynomial regressions
+
+
+
+
+# Limitations
+
+# Development Plans
+
+# Referances
