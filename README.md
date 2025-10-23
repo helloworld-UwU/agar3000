@@ -2,7 +2,7 @@
 
 # MaskRCNN based Pipeline for colonies detection and features extruction
 
-Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a computer?!  Try our new agarCNN+! It's super robust and extremely slow. Just be patient and (maybe) it will find even the smallest colonies, extract their sizes and colours, and perform spatial clustering (in case you use the stripe technique for plating, but we do!).
+Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a computer?!  Try our new agar3000! It's super robust and extremely slow. Just be patient and (maybe) it will find even the smallest colonies, extract their sizes and colours, and perform spatial clustering (in case you use the stripe technique for plating, but we do!).
 
 Made to improve and extend capabilities of:
 
@@ -42,7 +42,7 @@ https://cedricproject.eu/
 
 # How to use?
 
-&emsp;&emsp; *python demo.py*
+&emsp;&emsp; *python agar3000.py path/to/your/photos*
 
 test_data is used for the demo. Otherwise, specify the path to the folder containing the photos of plates. All other arguments are accessible through the CONFIG section of agarrcnn.py.
 
