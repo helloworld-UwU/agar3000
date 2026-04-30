@@ -7,7 +7,8 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 <img src="img33.png"/>
 <img src="img22.png"/>
 
-# How to install?
+# Get started
+Agar3000 requires python
 1. Download: Code > Download ZIP
 2. Unpack
 3. Download .h5 file from this link: https://drive.google.com/file/d/19-mxrjV_EeSQAb7SppIVG_vgjse_pP7u/view?usp=sharing
