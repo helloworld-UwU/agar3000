@@ -1,4 +1,4 @@
-<img src="logo4.png" alt="drawing" width="200"/>
+<img src="logo4.png" alt="drawing"/>
 
 # MaskRCNN based Pipeline for colonies detection and features extruction
 
