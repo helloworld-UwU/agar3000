@@ -1,0 +1,53 @@
+---
+title: "Validation Report"
+output: html_document
+params:
+  data: NULL
+  mode: NULL
+  report_title: "My Report"
+---
+
+
+```{r setup, include=FALSE}
+# Access the data
+df <- params$data
+ref <- params$mode
+report_title <- params$report_title
+
+# Detect which human rater columns exist
+human_cols <- c("Domi_nor", "Amelie_nor", "Vadym_nor")
+available_humans <- intersect(human_cols, colnames(df))
+has_human_pair <- length(available_humans) >= 2
+```
+
+### ====================================================
+### ANALYSIS
+# --- 1. RELATIVE BLAND-ALTMAN + sMAPE  ---
+# human vs human
+```{r 1, echo=FALSE, eval=has_human_pair}
+analyze_relative_ba_sMAPE(df[df$Average_Human > 10,], "Domi_nor", "Amelie_nor", "Human 1 vs Human 2 (Relative)")
+```
+
+# human vs machine
+```{r 2, echo=FALSE}
+analyze_relative_ba_sMAPE(df[df$Average_Human > 10,], "Colonies", ref, "Program vs Human Reference")
+```
+
+# --- 2. DEMING REGRESSION ---
+# human vs human
+```{r 3, echo=FALSE, eval=has_human_pair}
+analyze_deming_regression(df[df$Average_Human > 10,], "Domi_nor", "Amelie_nor", "Human 1 vs Human 2 (Relative)")
+```
+
+# human vs machine
+```{r 4, echo=FALSE}
+analyze_deming_regression(df[df$Average_Human > 10,], "Colonies", ref, "Program vs Human Reference")
+```
+
+# --- 3. CCC MATRIX PLOT  ---
+```{r 5, echo=FALSE}
+ccc_cols <- c(available_humans, ref, "Colonies")
+# keep only columns that actually exist in df
+ccc_cols <- intersect(ccc_cols, colnames(df))
+plot_ccc_matrix(df[df$Average_Human > 10,], ccc_cols)
+```
