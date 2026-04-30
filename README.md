@@ -22,8 +22,9 @@ https://www.uibk.ac.at/de/microbiology/forschen/alpine-umweltmikrobiologie/envir
 CEDRIC project 
 
 https://cedricproject.eu/
-<img src="img22.png"/>
 <img src="img33.png"/>
+<img src="img22.png"/>
+
 # How to install?
 1. Download: Code > Download ZIP
 2. Unpack
