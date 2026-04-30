@@ -1,27 +1,9 @@
 <img src="logo4.png" alt="drawing"/>
 
-# MaskRCNN based Pipeline for colonies detection and features extruction
+An application that automatically detects and counts colonies on images of agar plates.
 
-Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a computer?!  Try our new agarCNN+! It's super robust and extremely slow. Just be patient and (maybe) it will find even the smallest colonies, extract their sizes and colours, and perform spatial clustering (in case you use the stripe technique for plating, but we do!).
+Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
 
-Made to improve and extend capabilities of:
-
-https://github.com/dedovskaya/CFUCounter
-
-**Main improvments:**
-- detection of small colonies
-- features extraction
-- stripes segmentation (for stripes plating method)
-
-**Affilation:**
-
-University of Innsbruck, Institute of Microbiology, Environmental OMICS group
-
-https://www.uibk.ac.at/de/microbiology/forschen/alpine-umweltmikrobiologie/environmental-omics-e-omics/
-
-CEDRIC project 
-
-https://cedricproject.eu/
 <img src="img33.png"/>
 <img src="img22.png"/>
 
