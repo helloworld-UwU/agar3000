@@ -78,6 +78,12 @@ validation.html -> comparison of demo-results (number of colonies) with validati
 
 # Limitations
 
-# Development Plans
+## License
+
+- **Code:** MIT (see LICENSE file)
+- **Model weights:** CC BY-NC 4.0 — non-commercial use only
+
+Commercial use of the model weights requires a separate 
+agreement with the training dataset authors: https://agar.neurosys.com/
 
 # Referances
