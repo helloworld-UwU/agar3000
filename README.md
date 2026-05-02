@@ -4,8 +4,8 @@ A tool that automatically detects and counts colonies on images of agar plates.
 
 Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
 
-# Requirements
-## Images
+## Requirements
+### Images
 1. Images can be taken by any camera including camera of your smartphone.
 2. Images should be captured on an even background and under sufficient illumination. Plate has to occupie most of the image (at least 2/3 if comparing diameter of a plate to small side of image)
 3. Condensat and other inperfection on a lid could cause incorrect results. Tool has certain tolerance to bubbles
