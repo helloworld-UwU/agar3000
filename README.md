@@ -8,17 +8,17 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 ### Images
 1. Images can be taken by any camera including camera of your smartphone.
 2. Images should be captured on an even background and under sufficient illumination. Plate has to occupie most of the image (at least 2/3 if comparing diameter of a plate to small side of image)
-3. Condensat and other inperfection on a lid could cause incorrect results. Tool has certain tolerance to bubbles
+3. Condensat and other inperfection on a lid could potentialy cause incorrect results. Tool has certain tolerance to bubbles in agar
 
 Maybe for workflow?
 
 4. Recomended minimal resolution: 2048x2048. Higher resolution will not improve results
-5. Tool supports jpg and png formats
+5. Tool supports jpg and png formats of images
 
 ## Hardware
 
 Agar3000 can be run on any x86 systems. It can also engage your GPU what significantly speed up computations.
-For GPU
+
 
 <img src="img34.png"/>
 <img src="img22.png"/>
