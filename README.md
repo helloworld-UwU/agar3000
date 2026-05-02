@@ -4,6 +4,21 @@ A tool that automatically detects and counts colonies on images of agar plates.
 
 Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
 
+# Requirements
+## Images
+1. Images can be taken by any  camera including camera of your smartphone.
+2. Images should be captured on an even background under sufficient illumination
+3. Condensat and other inperfection on a lid could cause incorrect results. Tool has certain tolerance to bubbles
+4. Plate has occupie most of the image
+
+Maybe for workflow?
+6. Recomended minimal resolution: 2048x2048. Higher resolution will not improve results
+7. Tool supports jpg and png formats
+
+## Hardware
+Agar3000 can be run on any x86 systems. It can also engage your GPU what significantly speed up computations.
+For GPU
+
 <img src="img34.png"/>
 <img src="img22.png"/>
 
@@ -25,7 +40,7 @@ Agar3000 requires python
 
 &emsp;&emsp; *pip install -r requirements.txt*
 
-# How to use?
+# Workflow
 
 &emsp;&emsp; *python demo.py*
 
@@ -34,7 +49,7 @@ test_data is used for the demo. Otherwise, specify the path to the folder contai
 After the initial preprocessing, the program halts allowing you to check the intermediate results. It's important, since the next step can be very time-consuming. Press 'y' if you are ready to continue and wait untill it's done.
 
 
-# Results
+## Results
 Since the package is in development phase we save and visualize all relevant information for debuging. Results can be found in a dedicated folder inside original images folder.  Each photo of a plate results:
 
 ### preprocessing
@@ -74,11 +89,10 @@ validation.html -> comparison of demo-results (number of colonies) with validati
 9. **Stripe_Polreg:** according to mixture of polynomial regressions
 
 
+# QnA
 
 
-# Limitations
-
-## License
+# License
 
 - **Code:** MIT (see LICENSE file)
 - **Model weights:** CC BY-NC 4.0 — non-commercial use only
