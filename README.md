@@ -1,6 +1,6 @@
 <img src="logo4.png" alt="drawing"/>
 
-An application that automatically detects and counts colonies on images of agar plates.
+A tool that automatically detects and counts colonies on images of agar plates.
 
 Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
 
