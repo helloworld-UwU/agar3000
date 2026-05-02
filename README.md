@@ -8,7 +8,7 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 ### Images
 1. Images can be taken by any camera including camera of your smartphone.
 2. Images should be captured on an even background and under sufficient illumination. Plate has to occupie most of the image (at least 2/3 if comparing diameter of a plate to small side of image)
-3. Condensat and other inperfection on a lid could potentialy cause incorrect results. Tool has certain tolerance to bubbles in agar
+3. Condensat, glair and other inperfection on a lid could potentialy cause incorrect results. Tool has certain tolerance to bubbles in agar
 
 Maybe for workflow?
 
