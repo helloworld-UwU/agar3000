@@ -40,7 +40,7 @@ For CPU-only working mode and python v3.10 - 3.14:
 
     python agar3000.py input_path output_path [-t] [-b] [-h] [--extra] [--no-crop]
 
-
+* `-q, --qualified_quality_phred`
 
 
 
