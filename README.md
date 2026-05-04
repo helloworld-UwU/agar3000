@@ -5,6 +5,8 @@ A tool that automatically detects and counts colonies on images of agar plates.
 Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
 
 ## Requirements
+<details>
+  <summary markdown="span">Click me to expand</summary>
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
 2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
@@ -20,6 +22,8 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
 <img src="img23.png"/>
+</details>
+
 
 
 
@@ -33,7 +37,9 @@ For CPU-only working mode and python v3.10 - 3.14:
 
 ## Workflow
 
-&emsp;&emsp; *python agar3000.py input_path output_path*
+    python agar3000.py input_path output_path [-t] [-b] [-h] [--extra] [--no-crop]
+
+
 
 
 
