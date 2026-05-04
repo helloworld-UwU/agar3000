@@ -38,60 +38,35 @@ For CPU-only working mode and python v3.10 - 3.14:
 
 ## Workflow
 
-    python agar3000.py input_path output_path [-t] [-b] [-h] [--extra] [--no-crop]
+    python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra] 
 
 * `input_path`: Path to the folder with images of plates. Non-recursive: files in nested subdirectories are not processed. Input_path can be a single image file.
-* 
+* `output_path`: Path to the folder where results will be saved. It will be created automatically if not exist.
+* `-t`: Implements a different model trained for detecting collonies on transilluminated plates (see image3 and 4 in examples)
+* `-b`: Creats finer grid during tiling procedure, preserving higher resolution of image during inference. May improve detection of small colonies but also slow down inference if run on cpus-only.
+* `--no-crop`: Skipps cropping of images. Usfull if cropping fails or plates are not circular
+* `--extra`: Preserves and saves some intermediate stages of image processing: cropped images, tiles before demultiplication, tiles after demultiplication. Significantly slowdown inference.
 
+Results include:
+- images of plates with drown boxes
+- csvs with annotation for each plate
+- RESULTS.csv with the index(file name) and number of colonies
 
+For the first run we recomend to test the tool on the single image. Or you can try our demo:
 
-test_data is used for the demo. Otherwise, specify the path to the folder containing the photos of plates. All other arguments are accessible through the CONFIG section of agarrcnn.py.
+    python agar3000.py demo demo/results
+    
+or for transilluminated plates:
 
-After the initial preprocessing, the program halts allowing you to check the intermediate results. It's important, since the next step can be very time-consuming. Press 'y' if you are ready to continue and wait untill it's done.
+    python agar3000.py demo_t demo_t/results
+
 
 <img src="img35.png"/>
 
-## Results
-Since the package is in development phase we save and visualize all relevant information for debuging. Results can be found in a dedicated folder inside original images folder.  Each photo of a plate results:
 
-### preprocessing
-ori_***.jpg -> original image
+## QnA
 
-cropped_***.jpg -> cropped image
-
-thr_***.jpg -> thresholded image(for proper spliting)
-
-splits_***/ -> folder with splits of image and possitioning file
-
-### colonies detection and feature extruction
-results_***.csv -> all numerical results see description below
-
-results_\*\*\*.png -> image of plates reconstructed by using data from results_***.csv
-
-### stripes detection
-***_kmean_plot.png -> results of kmean on pc1 stripes detection
-
-***_pol_plot.png -> results of fiting a mixture of polynomial regression
-
-### summary
-Can be find in the root folder *results/*
-
-all_results.csv
-validation.html -> comparison of demo-results (number of colonies) with validation values (manual counting)
-
-## Content of *results.csv*
-1. **Label:** colony index (sequence of natural numbers)
-2. **Rois:** coordinates of box inclosing colony 
-3. **Mask:** binary mask of colony
-4. **X,Y:** coordinates of center
-5. **Area:** area in pixels; derived from mask
-6. **R,G,B:** average colore of colony (masked region)
-7. **Stripe:** stripe according to initiial spliting
-8. **Stripe_Kmean:** according to k-means on PC1 clustering
-9. **Stripe_Polreg:** according to mixture of polynomial regressions
-
-
-# QnA
+TBD
 
 
 # License
@@ -103,3 +78,4 @@ Commercial use of the model weights requires a separate
 agreement with the training dataset authors: https://agar.neurosys.com/
 
 # Referances
+Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
