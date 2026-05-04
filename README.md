@@ -72,7 +72,7 @@ For the first run we recomend to test the tool on the single image. Or you can t
 
     python agar3000.py demo demo/results
     
-or for transilluminated plates:
+for transilluminated plates:
 
     python agar3000.py demo_t demo_t/results
 
