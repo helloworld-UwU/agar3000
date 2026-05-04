@@ -20,7 +20,7 @@ Maybe for workflow?
 Agar3000 can be run on any x86 systems. It can also engage your GPU what significantly speed up computations.
 
 
-<img src="img34.png"/>
+<img src="img35.png"/>
 <img src="img23.png"/>
 
 # Get started
