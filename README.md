@@ -22,7 +22,7 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
-<img src="_img1.png"/>
+<img src="_img11.png"/>
 </details>
 
 
