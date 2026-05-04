@@ -28,8 +28,8 @@ Agar3000 requires **python** with **opencv** and **onnxruntime** packages. We re
 
 For CPU-only working mode and python v3.10 - 3.14:
 
-  pip install onnxruntime=1.25.1
-  pip install opencv=4.13.0.92
+    pip install onnxruntime=1.25.1
+    pip install opencv=4.13.0.92
 
 ## Workflow
 
