@@ -2,7 +2,7 @@
 
 A tool that automatically detects and counts colonies on images of agar plates.
 
-Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?!  Try our new agar3000! 
+Do you think that automated colony counting isn't for you🤨? Are your plates too tough for a machine?! Make photos on your smartphone and try our new agar3000! 
 
 ## Requirements
 <details>
