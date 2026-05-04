@@ -27,6 +27,7 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux**. I
 Agar3000 requires **python** with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for instalation: https://www.anaconda.com/download/
 
 For CPU-only working mode and python v3.10 - 3.14:
+
 &emsp;&emsp; *pip install onnxruntime=1.25.1*
 &emsp;&emsp; *pip install opencv=4.13.0.92*
 
