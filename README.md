@@ -65,7 +65,7 @@ For compatability with other versions of CUDA and ROCm see coresponding tables:
 
 Results include:
 - images of plates with drown boxes
-- csvs with annotation for each plate
+- csvs with annotation for each file/plate
 - RESULTS.csv with the number of colonies for each file/plate
 
 For the first run we recomend to test the tool on the single image. Or you can try our demo:
