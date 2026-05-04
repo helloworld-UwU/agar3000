@@ -14,12 +14,13 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 6. Supported image formats are JPG and PNG.
 
 ### Hardware
-Agar3000 can be run on any x86 systems. It can also engage your GPU what significantly speed up computations.
+Agar3000 can be run on any x86-based system. It can also utilize a compatible GPU to significantly accelerate computations.
+
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), and are supported on Linux only.
 
+<img src="img23.png"/>
 
-<img src="img35.png"/>
 
 
 # Get started
@@ -50,7 +51,7 @@ test_data is used for the demo. Otherwise, specify the path to the folder contai
 
 After the initial preprocessing, the program halts allowing you to check the intermediate results. It's important, since the next step can be very time-consuming. Press 'y' if you are ready to continue and wait untill it's done.
 
-<img src="img23.png"/>
+<img src="img35.png"/>
 
 ## Results
 Since the package is in development phase we save and visualize all relevant information for debuging. Results can be found in a dedicated folder inside original images folder.  Each photo of a plate results:
