@@ -66,10 +66,10 @@ or for transilluminated plates:
 
 ## QnA
 
-TBD
+--TBD--
 
 
-# License
+## License
 
 - **Code:** MIT (see LICENSE file)
 - **Model weights:** CC BY-NC 4.0 — non-commercial use only
@@ -77,5 +77,5 @@ TBD
 Commercial use of the model weights requires a separate 
 agreement with the training dataset authors: https://agar.neurosys.com/
 
-# Referances
+# 
 Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
