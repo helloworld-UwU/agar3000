@@ -50,7 +50,7 @@ For CPU-only working mode and python v3.10 - 3.14:
 Results include:
 - images of plates with drown boxes
 - csvs with annotation for each plate
-- RESULTS.csv with the index(file name) and number of colonies
+- RESULTS.csv with the number of colonies for each file/plate
 
 For the first run we recomend to test the tool on the single image. Or you can try our demo:
 
