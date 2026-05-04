@@ -67,6 +67,8 @@ Results include:
 - images of plates with drown boxes
 - csvs with annotation for each file/plate
 - RESULTS.csv with the number of colonies for each file/plate
+- agar3000_[timestamp].log
+  
 
 For the first run we recomend to test the tool on the single image. Or you can try our demo:
 
