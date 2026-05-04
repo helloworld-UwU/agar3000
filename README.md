@@ -36,7 +36,7 @@ For CPU-only inference:
     pip install onnxruntime
     pip install opencv-python
 
-For GPU inferance with CUDA 12.x + cuDNN 9.x:
+For GPU inference with CUDA 12.x + cuDNN 9.x:
 
     pip install onnxruntime-gpu
     pip install opencv-python
