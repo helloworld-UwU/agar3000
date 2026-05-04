@@ -6,7 +6,7 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 
 ## Requirements
 <details>
-  <summary markdown="span">Click me to expand</summary>
+  <summary markdown="span">Click to expand</summary>
 
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
