@@ -6,22 +6,21 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 
 ## Requirements
 ### Images
-1. Images can be taken by any camera including camera of your smartphone.
-2. Images should be captured on an even background and under sufficient illumination. Plate has to occupie most of the image (at least 2/3 if comparing diameter of a plate to small side of image)
-3. Condensat, glair and other inperfection on a lid could potentialy cause incorrect results. Tool has certain tolerance to bubbles in agar
+1. Photos may be captured using any camera, including a smartphone camera.
+2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
+3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has certain tolerance for bubbles within the agar.
+4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on non-standard media.
+5. The recommended minimum resolution is 2048 × 2048 pixels; higher resolutions do not significantly improve results.
+6. Supported image formats are JPG and PNG.
 
-Maybe for workflow?
-
-4. Recomended minimal resolution: 2048x2048. Higher resolution will not improve results
-5. Tool supports jpg and png formats of images
-
-## Hardware
-
+### Hardware
 Agar3000 can be run on any x86 systems. It can also engage your GPU what significantly speed up computations.
+- NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
+- AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), and are supported on Linux only.
 
 
 <img src="img35.png"/>
-<img src="img23.png"/>
+
 
 # Get started
 Agar3000 requires python with opencv and onnxruntime packages
@@ -51,6 +50,7 @@ test_data is used for the demo. Otherwise, specify the path to the folder contai
 
 After the initial preprocessing, the program halts allowing you to check the intermediate results. It's important, since the next step can be very time-consuming. Press 'y' if you are ready to continue and wait untill it's done.
 
+<img src="img23.png"/>
 
 ## Results
 Since the package is in development phase we save and visualize all relevant information for debuging. Results can be found in a dedicated folder inside original images folder.  Each photo of a plate results:
