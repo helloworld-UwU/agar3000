@@ -6,7 +6,8 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 
 ## Requirements
 <details>
-  <summary markdown="span">Click me to expand</summary>
+  <summary markdown="span">## Click me to expand</summary>
+
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
 2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
