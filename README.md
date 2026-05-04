@@ -1,4 +1,4 @@
-<img src="logo5.png" alt="drawing"/>
+<img src="head.png" alt="drawing"/>
 
 A tool that automatically detects and counts colonies on images of agar plates.
 
@@ -22,7 +22,7 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
-<img src="img23.png"/>
+<img src="img1.png"/>
 </details>
 
 
@@ -77,7 +77,7 @@ or for transilluminated plates:
     python agar3000.py demo_t demo_t/results
 
 
-<img src="img35.png"/>
+<img src="img2.png"/>
 
 
 ## QnA
