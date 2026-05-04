@@ -57,29 +57,30 @@ def setup_logging(output_folder):
 # Pipeline
 # ----------------------------------------------------------------------
 
-def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt",
+def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
                         grid=(2, 2), overlap=0.2,
                         tol=5, scale=1024, score=0.25, extra=False,
                         mem_debug=False, no_crop=False, margin = 1, score_regression=None):
 
-    os.makedirs(output_folder, exist_ok=True)
+    
 
     try:
+        if not os.path.exists(input_path):
+            raise FileNotFoundError(f"Input path/file does not exist: {input_path}")
+                
         EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
-
-        rcnn = load_model(model)
         
-        if os.path.isfile(input_folder):
-            if os.path.splitext(input_folder)[1].lower() not in EXTS:
-                raise ValueError(f"Unsupported file type: {input_folder}")
-            img_paths = [input_folder]
+        if os.path.isfile(input_path):
+            img_paths = [input_path]        
+        
         else:
             img_paths = []
             for e in (f"*{ext}" for ext in EXTS):
-                img_paths.extend(glob.glob(os.path.join(input_folder, e)))
-
-        print(f"Found images: {len(img_paths)}")
-
+                img_paths.extend(glob.glob(os.path.join(input_path, e)))
+                
+        
+        rcnn = load_model(model)
+        
         for img_path in sorted(img_paths):
             print("-----------------------------------------------------")
             print("-----------------------------------------------------")
@@ -90,7 +91,7 @@ def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt"
             if no_crop:
                 plate.cropped = plate.image
             elif extra:
-                ext_out = os.path.join(output_folder, "crop")
+                ext_out = os.path.join(output_path, "crop")
                 os.makedirs(ext_out, exist_ok=True)
                 cv2.imwrite(os.path.join(ext_out, f"{plate.sample_id}.png"), plate.cropped)
 
@@ -102,7 +103,7 @@ def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt"
             print("-----------------------------------------------------")
 
             if extra:
-                ext_out = os.path.join(output_folder, "dup")
+                ext_out = os.path.join(output_path, "dup")
                 tiling.show_all_tiles_with_boxes(tiles, key="tile_with_boxes",
                                                  cols=None,
                                                  output_folder=ext_out,
@@ -112,7 +113,7 @@ def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt"
             tiling.resolve_duplicates_across_tiles(tiles, tol=tol, detections_key="colonies")
 
             if extra:
-                ext_out = os.path.join(output_folder, "dedup")
+                ext_out = os.path.join(output_path, "dedup")
                 tiling.show_all_tiles_with_boxes(tiles, key="tile_with_boxes",
                                                  cols=None,
                                                  output_folder=ext_out,
@@ -128,8 +129,8 @@ def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt"
             
             tiling.show_all_rois_global(plate.cropped, tiles, detections_key="colonies",
                                         color=(0, 0, 255), thickness=2,
-                                        name=plate.sample_id, output_folder=output_folder)
-            tiling.save_plate_tiles_to_csv(output_folder, tiles, name=plate.sample_id)
+                                        name=plate.sample_id, output_folder=output_path)
+            tiling.save_plate_tiles_to_csv(output_path, tiles, name=plate.sample_id)
             print(f"Results saved: {plate.sample_id} ({timestamp()})")
 
             del plate, tiles
@@ -145,16 +146,26 @@ def run_folder_pipeline(input_folder, output_folder, model="model/frcnn_norm.pt"
 # ----------------------------------------------------------------------
 
 def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("input",  type=str,
-                   help="path to the folder with images of plates, or single image")
-    p.add_argument("output_folder", type=str,
-                   help="place for the counting results")
+    p = argparse.ArgumentParser(
+        epilog=(
+            "Try it with the demo data:\n"
+            "  Surface illuminated plates:  python agar3000.py demo demo/results\n"
+            "  Transilluminated plates:     python agar3000.py demo demo_t/results -t"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    p.add_argument("input_path",  type=str,
+                   help="path to the folder with plate images, or single image file")
+    p.add_argument("output_path", type=str,
+                   help="path for results")
     p.add_argument("-t", action="store_true",
-                   help="use separate method if your plates are transilluminated")
+                   help="use if your plates are transilluminated")
     p.add_argument("-b", action="store_true",
                    help="let program think more to get better precision")
-    p.add_argument("--extra", action="store_true", help="put for more intermediate output")
+    p.add_argument("--extra", action="store_true", 
+                   help="get more of intermediate output")
+    p.add_argument("--no-crop",action="store_true", 
+                   help="skip plate cropping (use for non-circular plates)")
     
     p.add_argument("--model",      type=str,   default="model/frcnn_lr.onnx",  help=argparse.SUPPRESS)
     p.add_argument("--rows",       type=int,   default=3,                      help=argparse.SUPPRESS)
@@ -166,7 +177,6 @@ def main():
     p.add_argument("--mem-debug",  action="store_true",                        help=argparse.SUPPRESS)
     p.add_argument("--validation", action="store_true",                        help=argparse.SUPPRESS)
     p.add_argument("--ref",        type=str,   default="ref.csv",              help=argparse.SUPPRESS)
-    p.add_argument("--no-crop",    action="store_true",                        help=argparse.SUPPRESS)
     p.add_argument("--margin",     type=float, default=1,                      help=argparse.SUPPRESS)
     p.add_argument("--ld",         type=float, default=0.05,                   help=argparse.SUPPRESS)
     p.add_argument("--hd",         type=float, default=-0.10,                  help=argparse.SUPPRESS)
@@ -184,18 +194,38 @@ def main():
         args.score = 0.20
         regression = "y = -0.000517x + 0.255172"
 
+    # --- Input validation  ---
+    EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
+
+    if not os.path.exists(args.input_path):
+        print(f"ERROR: Input path/file does not exist: {args.input_path}")
+        sys.exit(1)
+    elif os.path.isfile(args.input_path):
+        if os.path.splitext(args.input_path)[1].lower() not in EXTS:
+            print(f"ERROR: Unsupported file type: {args.input_path}\n"
+                  f"  Supported formats: {', '.join(sorted(EXTS))}")
+            sys.exit(1)
+    else:
+        matches = []
+        for e in (f"*{ext}" for ext in EXTS):
+            matches.extend(glob.glob(os.path.join(args.input_path, e)))
+        if not matches:
+            print(f"ERROR: No supported images found in folder: {args.input_path}\n"
+                  f"  Supported formats: {', '.join(sorted(EXTS))}")
+            sys.exit(1)
+
     # Start logging — everything from here on is captured to the log file
-    os.makedirs(args.output_folder, exist_ok=True)
-    tee, log_path = setup_logging(args.output_folder)
+    os.makedirs(args.output_path, exist_ok=True)
+    tee, log_path = setup_logging(args.output_path)
 
     try:
         print(f"START: {timestamp()}")
         print("=====================================================")
-        print("Agar3000 v0.2")
+        print("Agar3000 v0.2.2")
         print("=====================================================")
         print("Configuration:")
-        print(f"  Input                   : {args.input}")
-        print(f"  Output folder           : {args.output_folder}")
+        print(f"  Input                   : {args.input_path}")
+        print(f"  Output folder           : {args.output_path}")
         print(f"  Mode                    : {'Transillumination' if args.t else 'Surface illumination'}")
         print(f"  Model                   : {args.model}")
         if args.no_crop:
@@ -217,8 +247,8 @@ def main():
         print("-----------------------------------------------------")
 
         run_folder_pipeline(
-            input_folder  = args.input,
-            output_folder = args.output_folder,
+            input_path    = args.input_path,
+            output_path   = args.output_path,
             model         = args.model,
             grid          = (args.rows, args.cols),
             overlap       = args.overlap,
@@ -231,16 +261,19 @@ def main():
             margin        = args.margin,
             score_regression = (args.ld, args.hd)
         )
-
         
-        summarize_colonies(args.output_folder, f"{args.output_folder}/sum.csv")
+        print("-----------------------------------------------------")
+        print(f"FINISH: {timestamp()}")
+        
+        results_path = f"{args.output_path}/RESULTS.csv"
+        summarize_colonies(args.output_path, results_path)
 
         if args.validation:
             import subprocess
             cmd = [
                 "Rscript", "main/validation.R",
-                "-i", f"{args.output_folder}/sum.csv",
-                "-o", f"{args.output_folder}/validation_report.html",
+                "-i", f"{args.output_path}/sum.csv",
+                "-o", f"{args.output_path}/validation_report.html",
                 "-r", args.ref,
                 "-t", "main/report_template.Rmd",
             ]
@@ -249,9 +282,6 @@ def main():
             except subprocess.CalledProcessError as e:
                 print(f"R script failed with exit code {e.returncode}")
                 sys.exit(1)
-
-        print("-----------------------------------------------------")
-        print(f"FINISH: {timestamp()}")
 
     finally:
         tee.close()

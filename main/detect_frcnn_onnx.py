@@ -20,7 +20,7 @@
 #
 #   # detections: list of dicts {x1, y1, x2, y2, score, label}
 #
-# Requirements: onnxruntime or onnxruntime-gpu (auto GPU->CPU fallback)
+# Requirements: onnxruntime, onnxruntime-gpu or onnxruntime-rocm (auto GPU->CPU fallback)
 
 import argparse
 import os
@@ -42,43 +42,92 @@ MIN_BOX_SIZE = 4  # drop boxes smaller than this in either dimension (original c
 # --------------------------------------------------------------------------- #
 # Model loading
 # --------------------------------------------------------------------------- #
-
+ 
+def _detect_gpu():
+    """
+    Probe for a usable GPU using vendor CLI tools.
+ 
+    Returns:
+        vendor : str  - "nvidia", "amd", or "none"
+ 
+    Detection order: NVIDIA first (more common in HPC), then AMD.
+    If both CLIs respond (unlikely but possible on multi-vendor nodes),
+    NVIDIA takes priority; adjust the order below if needed.
+    """
+    import subprocess
+    for cmd, vendor in [("nvidia-smi", "nvidia"), ("rocm-smi", "amd")]:
+        try:
+            subprocess.check_output([cmd], stderr=subprocess.DEVNULL)
+            return vendor
+        except Exception:
+            pass
+    return "none"
+ 
+ 
 def load_model(model_path):
     """
     Load an ONNX model with automatic GPU->CPU fallback.
     Returns an onnxruntime.InferenceSession.
-    CUDA_VISIBLE_DEVICES is set before session creation to prevent ORT from
-    spawning affinity-failing threads on nodes with broken/missing CUDA drivers.
+ 
+    Provider priority:
+        NVIDIA : CUDAExecutionProvider
+                 -> CPUExecutionProvider
+        AMD    : ROCMExecutionProvider
+                 -> MIGraphXExecutionProvider  (only when present in ORT build)
+                 -> CPUExecutionProvider
+        None   : CPUExecutionProvider
+ 
+    The appropriate device-visibility env var is blanked when no usable GPU is
+    found, to prevent ORT from spawning threads that fail on broken drivers:
+        CUDA_VISIBLE_DEVICES  -- hides GPUs from the CUDA runtime
+        HIP_VISIBLE_DEVICES   -- hides GPUs from the ROCm/HIP runtime
+    Both are cleared on CPU-only fallback so mixed-vendor nodes stay safe.
+ 
+    NOTE: For AMD support you must install the ROCm ORT wheel, e.g.:
+        pip install onnxruntime-rocm
+    The standard onnxruntime-gpu wheel only contains CUDA providers.
     """
-    import subprocess
-
-    # Check if GPU is actually usable
-    gpu_ok = False
-    try:
-        subprocess.check_output(["nvidia-smi"], stderr=subprocess.DEVNULL)
-        gpu_ok = True
-    except Exception:
-        pass
-
-    # If GPU is not usable, hide CUDA from ORT entirely.
-    # This must be done before InferenceSession is created.
-    # If onnxruntime was already imported, this only works if the CUDA
-    # provider has not been initialized yet -- which is the case here
-    # since we call this once at startup.
-    if not gpu_ok:
+    ort_available = ort.get_available_providers()
+    vendor        = _detect_gpu()
+ 
+    if vendor == "nvidia":
+        # Blank AMD visibility in case a ROCm ORT build is also installed
+        os.environ.setdefault("HIP_VISIBLE_DEVICES", "")
+        candidate_providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+        device_label        = "NVIDIA GPU (CUDA)"
+ 
+    elif vendor == "amd":
+        # Blank NVIDIA visibility symmetrically
+        os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
+        # Always prefer ROCm; include MIGraphX only if the ORT build has it.
+        # MIGraphX can be faster for some models but requires extra setup.
+        candidate_providers = ["ROCMExecutionProvider"]
+        if "MIGraphXExecutionProvider" in ort_available:
+            candidate_providers.append("MIGraphXExecutionProvider")
+        candidate_providers.append("CPUExecutionProvider")
+        device_label = "AMD GPU (ROCm)"
+ 
+    else:
+        # No usable GPU -- hide both CUDA and HIP to avoid driver-probe hangs
         os.environ["CUDA_VISIBLE_DEVICES"] = ""
-
-    providers = ["CUDAExecutionProvider", "CPUExecutionProvider"] if gpu_ok \
-                else ["CPUExecutionProvider"]
-
-    available = [p.split("ExecutionProvider")[0] for p in ort.get_available_providers()]
-    active    = [p for p in providers if p in ort.get_available_providers()]
-    device    = "GPU" if "CUDAExecutionProvider" in active else "CPU"
-
-    print("[INFO] Available ORT providers : {}".format(available))
+        os.environ["HIP_VISIBLE_DEVICES"]  = ""
+        candidate_providers = ["CPUExecutionProvider"]
+        device_label        = "CPU"
+ 
+    # Restrict to providers that are actually compiled into this ORT build
+    active_providers = [p for p in candidate_providers if p in ort_available]
+    if not active_providers:
+        print("[WARN] None of {} found in this ORT build; falling back to CPU.".format(
+            candidate_providers))
+        print("[WARN] For AMD GPU support install: pip install onnxruntime-rocm")
+        active_providers = ["CPUExecutionProvider"]
+        device_label     = "CPU (fallback -- ORT build mismatch)"
+ 
+    available_names = [p.replace("ExecutionProvider", "") for p in ort_available]
+    print("[INFO] Available ORT providers : {}".format(available_names))
     print("[INFO] Loading model           : {}".format(model_path))
-    print("[INFO] Active device           : {}".format(device))
-
+    print("[INFO] Active device           : {}".format(device_label))
+ 
     n_threads = int(
         os.environ.get("SLURM_CPUS_PER_TASK") or
         os.environ.get("SLURM_CPUS_ON_NODE")  or
@@ -89,16 +138,21 @@ def load_model(model_path):
     opts.intra_op_num_threads = n_threads
     opts.inter_op_num_threads = n_threads
     print("[INFO] ORT threads             : {}".format(n_threads))
-
-    session = ort.InferenceSession(model_path, sess_options=opts, providers=providers)
-
+ 
+    session = ort.InferenceSession(
+        model_path,
+        sess_options=opts,
+        providers=active_providers,
+    )
+ 
     print("[INFO] Session provider        : {}".format(
         session.get_providers()[0].replace("ExecutionProvider", "")
     ))
     return session
 
+
 # --------------------------------------------------------------------------- #
-# Pre-processing  (identical to TorchScript version, minus .to(DEVICE))
+# Pre-processing  
 # --------------------------------------------------------------------------- #
 
 def preprocess(image, size, normalize=True, rgb=True):
@@ -150,7 +204,7 @@ def preprocess(image, size, normalize=True, rgb=True):
 
 
 # --------------------------------------------------------------------------- #
-# Post-processing  (same logic, adapted for numpy outputs)
+# Post-processing  
 # --------------------------------------------------------------------------- #
 
 def _filter_small_boxes(detections, min_size):
@@ -296,7 +350,7 @@ def detect_on_tiles(tiles, session, size=512, conf=0.25,
 
 
 # --------------------------------------------------------------------------- #
-# Visualisation  (unchanged)
+# Visualisation  
 # --------------------------------------------------------------------------- #
 
 def draw_boxes(img_bgr, detections, color=(0, 0, 255), use_global=False):
