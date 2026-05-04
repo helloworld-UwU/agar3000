@@ -14,7 +14,7 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 6. Supported image formats are JPG and PNG.
 
 ### Hardware
-Agar3000 can run on any x86-based system operating under **Windows or Linux**. It can also utilize a compatible GPU to significantly accelerate computations.
+Agar3000 can run on any x86-based system operating under **Windows or Linux** and requires up to 1G of RAM. It can also utilize a compatible GPU to significantly accelerate computations.
 
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
@@ -28,12 +28,14 @@ Agar3000 requires **python** with **opencv** and **onnxruntime** packages. We re
 
 For CPU-only working mode and python v3.10 - 3.14:
 
-&emsp;&emsp; *pip install onnxruntime=1.25.1*
-&emsp;&emsp; *pip install opencv=4.13.0.92*
+  pip install onnxruntime=1.25.1
+  pip install opencv=4.13.0.92
 
 ## Workflow
 
-&emsp;&emsp; *python demo.py*
+&emsp;&emsp; *python agar3000.py input_path output_path*
+
+
 
 test_data is used for the demo. Otherwise, specify the path to the folder containing the photos of plates. All other arguments are accessible through the CONFIG section of agarrcnn.py.
 
