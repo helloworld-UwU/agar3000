@@ -1,4 +1,4 @@
-<img src="logo4.png" alt="drawing"/>
+<img src="logo5.png" alt="drawing"/>
 
 A tool that automatically detects and counts colonies on images of agar plates.
 
