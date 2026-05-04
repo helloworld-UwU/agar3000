@@ -21,7 +21,7 @@ Agar3000 can be run on any x86 systems. It can also engage your GPU what signifi
 
 
 <img src="img34.png"/>
-<img src="img22.png"/>
+<img src="img23.png"/>
 
 # Get started
 Agar3000 requires python with opencv and onnxruntime packages
