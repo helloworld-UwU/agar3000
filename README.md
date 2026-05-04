@@ -6,15 +6,15 @@ Do you think that automated colony counting isn't for you🤨? Are your plates t
 
 ## Requirements
 ### Images
-1. Photos may be captured using any camera, including a smartphone camera.
+1. Photos may be captured using any camera, including **a smartphone camera**.
 2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
 3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has certain tolerance for bubbles within the agar.
 4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on non-standard media.
-5. The recommended minimum resolution is 2048 × 2048 pixels; higher resolutions do not significantly improve results.
+5. The recommended minimum resolution is 2048 × 2048 pixels; higher resolutions will not improve results.
 6. Supported image formats are JPG and PNG.
 
 ### Hardware
-Agar3000 can be run on any x86-based system. It can also utilize a compatible GPU to significantly accelerate computations.
+Agar3000 can run on any x86-based system operating under **Windows or Linux**. It can also utilize a compatible GPU to significantly accelerate computations.
 
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
@@ -23,27 +23,14 @@ Agar3000 can be run on any x86-based system. It can also utilize a compatible GP
 
 
 
-# Get started
-Agar3000 requires python with opencv and onnxruntime packages
+## Get started
+Agar3000 requires **python** with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for instalation: https://www.anaconda.com/download/
 
+For CPU-only working mode and python v3.10 - 3.14:
+&emsp;&emsp; *pip install onnxruntime=1.25.1*
+&emsp;&emsp; *pip install opencv=4.13.0.92*
 
-1. Download: Code > Download ZIP
-2. Unpack
-3. Download .h5 file from this link: https://drive.google.com/file/d/19-mxrjV_EeSQAb7SppIVG_vgjse_pP7u/view?usp=sharing
-4. Put .h5 file to "CFUCounter/agar_cfg20221010T2320" folder
-5. Download and install conda (if lacks): https://www.anaconda.com/download/success
-6. Open Anaconda Prompt
-7. Create a conda environment with Python 3.6.3:
-
-&emsp;&emsp; *conda create -n agarrcnn python=3.6.3*
-
-&emsp;&emsp; *conda activate agarrcnn*
-
-8. Install requirements: go to unpacked folder
-
-&emsp;&emsp; *pip install -r requirements.txt*
-
-# Workflow
+## Workflow
 
 &emsp;&emsp; *python demo.py*
 
