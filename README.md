@@ -44,6 +44,8 @@ For AMD GPU inference with ROCm 7.0:
 
     pip install opencv-python onnxruntime-rocm 
 
+Take a note, that _onnxruntime-gpu_ and _onnxruntime-rocm_ will fall back to CPU-mode if GPU initialisation failed. 
+
 For compatability with other versions of CUDA and ROCm see coresponding tables:
 
 [CUDA](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)
