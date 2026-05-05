@@ -68,7 +68,7 @@ For compatability with other versions of CUDA and ROCm see coresponding tables:
 * `--no-crop`: Skipps cropping of images. Usfull if cropping fails or plates are not circular
 * `--extra`: Preserves and saves some intermediate stages of image processing: cropped images, tiles before demultiplication, tiles after demultiplication. Significantly slowdown inference.
 
-Results include:
+#### Results include:
 - images of plates with drown boxes
 - csvs with annotation for each file/plate
 - RESULTS.csv with the number of colonies for each file/plate
