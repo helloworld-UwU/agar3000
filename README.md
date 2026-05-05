@@ -56,8 +56,13 @@ For compatability with other versions of CUDA and ROCm see coresponding tables:
 
     python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra] 
 
+**Main arguments:**
+
 * `input_path`: Path to the folder with images of plates. Non-recursive: files in nested subdirectories are not processed. Input_path can be a single image file.
 * `output_path`: Path to the folder where results will be saved. It will be created automatically if not exist.
+
+**Optinal arguments**
+
 * `-t`: Implements a different model trained for detecting collonies on transilluminated plates (see image3 and 4 in examples)
 * `-b`: Creats finer grid during tiling procedure, preserving higher resolution of image during inference. May improve detection of small colonies but also slow down inference if run on cpus-only.
 * `--no-crop`: Skipps cropping of images. Usfull if cropping fails or plates are not circular
