@@ -34,18 +34,15 @@ Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** package
 
 For CPU-only inference (recommended for testing):
 
-    pip install onnxruntime
-    pip install opencv-python
+    pip install opencv-python onnxruntime
 
 For Nvidia GPU inference with CUDA 12.x + cuDNN 9.x:
 
-    pip install onnxruntime-gpu
-    pip install opencv-python
+    pip install opencv-python onnxruntime-gpu 
 
 For AMD GPU inference with ROCm 7.0:
 
-    pip install onnxruntime-rocm
-    pip install opencv-python
+    pip install opencv-python onnxruntime-rocm 
 
 For compatability with other versions of CUDA and ROCm see coresponding tables:
 
