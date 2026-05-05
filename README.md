@@ -32,17 +32,17 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 ## Get started
 Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for instalation: https://www.anaconda.com/download/
 
-For CPU-only inference:
+For CPU-only inference (recommended for testing):
 
     pip install onnxruntime
     pip install opencv-python
 
-For GPU inference with CUDA 12.x + cuDNN 9.x:
+For Nvidia GPU inference with CUDA 12.x + cuDNN 9.x:
 
     pip install onnxruntime-gpu
     pip install opencv-python
 
-For GPU inference with ROCm 7.0:
+For AMD GPU inference with ROCm 7.0:
 
     pip install onnxruntime-rocm
     pip install opencv-python
