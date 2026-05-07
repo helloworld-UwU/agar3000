@@ -106,8 +106,17 @@ for transilluminated plates:
 - **Code:** MIT (see LICENSE file)
 - **Model weights:** CC BY-NC 4.0 — non-commercial use only
 
-Commercial use of the model weights requires a separate 
-agreement with the training dataset authors: https://agar.neurosys.com/
+## References
+This project was trained using the AGAR (Annotated Germs for Automated Recognition) dataset introduced in:
+
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., and Drulis-Kawa, Z.
+“AGAR: A Microbial Colony Dataset for Deep Learning Detection” (2021).
+
+--CHANGE--
+
+Dataset source: https://agar.neurosys.com/
+
+We gratefully acknowledge the authors and contributors for making this dataset publicly available.
 
 # 
 Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
