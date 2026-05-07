@@ -18,8 +18,8 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 1. Photos may be captured using any camera, including **a smartphone camera**.
 2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
 3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has certain tolerance for bubbles within the agar.
-4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on non-standard media.
-5. The recommended minimum resolution is 2048 × 2048 pixels; higher resolutions will not improve results.
+4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on unusually looking media.
+5. The recommended minimum image resolution is 2048 × 2048 pixels; higher resolutions will not improve results.
 6. Supported image formats are JPG and PNG.
 
 ### Hardware
