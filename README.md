@@ -121,4 +121,4 @@ We gratefully acknowledge the authors and contributors for making this dataset p
 # 
 Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
 
-If agar3000  was usefull for you, don't forget to recommend it your collegues and to mention it in your papers. Thanks!
+If agar3000  was usefull for you, don't forget to recommend it your collegues and to mention it in your papers. Thanks for testing!
