@@ -5,7 +5,8 @@ A tool that automatically detects and counts colonies on images of agar plates.
 Think automated colony counting isn't for you 🤨? Your plates are too "wild" for a machine?
 Take a photo with your smartphone and let agar3000 prove you wrong.
 
-- Does not require hyperparameters. Just input path with your images and output path for results
+
+- No hyperparameters required. Just an input path with your images and an output path for results
 - Can analyse up to 30 images per minut in normal mode and up to 80 images per minut with GPU acceleration.
 
 
