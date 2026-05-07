@@ -5,6 +5,10 @@ A tool that automatically detects and counts colonies on images of agar plates.
 Think automated colony counting isn't for you 🤨? Your plates are too "wild" for a machine?
 Take a photo with your smartphone and let agar3000 prove you wrong.
 
+Does not require hyperparameters. Just input path with your images and output path for results
+Can analyse up to 30 images per minut in normal mode and up to 80 images per minut with GPU acceleration.
+
+
 ## Requirements
 <details>
   <summary markdown="span">Click to expand</summary>
@@ -32,15 +36,19 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 ## Get started
 Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for instalation: https://www.anaconda.com/download/
 
-For CPU-only inference (recommended for testing):
+For CPU-only inference:
 
     pip install opencv-python onnxruntime
 
-For Nvidia GPU inference with CUDA 12.x + cuDNN 9.x:
+!!WARNING!! To install propper GPU-operating mode can be trickier and we don't recomend it for testing purpose only.
+
+GPU inference requires matching of GPU, [CUDA+cuDNN](https://developer.nvidia.com/cuda/) (for Nvidia GPUs) or [ROCm](https://www.amd.com/en/products/software/rocm.html) (for AMD GPUs), OS, python and onnxruntime versions. 
+
+For Nvidia GPU inference with CUDA 12.x + cuDNN 9.x, try:
 
     pip install opencv-python onnxruntime-gpu 
 
-For AMD GPU inference with ROCm 7.0:
+For AMD GPU inference with ROCm 7.0, try:
 
     pip install opencv-python onnxruntime-rocm 
 
@@ -102,3 +110,5 @@ agreement with the training dataset authors: https://agar.neurosys.com/
 
 # 
 Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
+
+If agar3000  was usefull for you, don't forget to recommend it your collegues and to mention it in your papers. Thanks!
