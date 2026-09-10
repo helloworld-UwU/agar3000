@@ -1,5 +1,7 @@
 <img src="_head.png" alt="drawing"/>
 
+**Yes, it's AI!**
+
 A tool that automatically detects and counts colonies on images of agar plates.
 
 Think automated colony counting isn't for you 🤨? Your plates are too "wild" for a machine?
