@@ -104,20 +104,27 @@ for trans-illuminated plates:
 
 ## QnA
 
-Which side of the plate has to be photographed?
-From the lid side. That's how the model was trained and tested.
+*Which side of the plate has to be photographed?*
 
-There is condensate under the lid. What do I have to do?
+The lid side. That's how the model was trained and tested.
+
+*There is condensate under the lid. What do I have to do?*
+
 Open the lid. The condensate may partially or completely  obscure the surface of agar.  Unfortunately we haven't found better solution then simply open the lid. Use laminar flow if required.
 
-Which illumination of the plate is an adequate one?
+*Which illumination of the plate is an adequate one?*
+
 The light has to be homogenous to prevent reflection artefacts. We used a LED-panel with diffuser.
 
-What is trans-illumination and is it better? 
+*What is trans-illumination and is it better?* 
+
 Trans-illumination is simply illumination of a transparent plate from behind,  
 
-Is hyper-trading beneficial for inference speed?
-No. In our tests it significantly slow down inference.
+*Is hyper-trading beneficial for inference speed?*
+
+No. In our tests it actually  significantly slowed down inference.
+
+
 
 
 
