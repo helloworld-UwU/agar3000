@@ -1,4 +1,4 @@
-<img src="_head.png" alt="drawing"/>
+<img src="logo.png" alt="drawing"/>
 
 **Yes, it's AI!**
 
@@ -8,8 +8,8 @@ Think automated colony counting isn't for you 🤨? Your plates are too "wild" f
 Take a photo with your smartphone and let agar3000 prove you wrong.
 
 
-- No hyperparameters required. Just an input path with your images and an output path for results
-- Can analyse up to 30 images per minut in normal mode and up to 80 images per minut with GPU acceleration.
+- No fine-tuning  or supervision required. Just an input path with your images and an output path for results
+- Can analyse up to 20 images per minute in CPU-mode and up to 65 with GPU acceleration.
 
 
 ## Requirements
@@ -22,28 +22,31 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has certain tolerance for bubbles within the agar.
 4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on unusually looking media.
 5. The recommended minimum image resolution is 2048 × 2048 pixels; higher resolutions will not improve results.
-6. Supported image formats are JPG and PNG.
+6. Supported image formats are JPG, PNG, TIFF, BMP (any formats supported by opencv)
 
 ### Hardware
-Agar3000 can run on any x86-based system operating under **Windows or Linux** and requires up to 1G of RAM. It can also utilize a compatible GPU to significantly accelerate computations.
+Agar3000 can run on any x86-based system operating under **Windows or Linux** and requires up to 1G of RAM. It can also utilise a compatible GPU to significantly accelerate computations.
 
 - NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
 - AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
-<img src="_img11.png"/>
+<img src="speed.png"/>
 </details>
 
 
 
 
 ## Get started
-Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for instalation: https://www.anaconda.com/download/
+Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
-For CPU-only inference:
+### CPU-mode:
 
     pip install opencv-python onnxruntime
 
-!!WARNING!! To install propper GPU-operating mode can be trickier and we don't recomend it for testing purpose only.
+
+### GPU-mode:
+
+!!WARNING!! To set up a GPU-mode can be tricky and we don't recommend unless the inference speed is necessary.
 
 GPU inference requires matching of GPU, [CUDA+cuDNN](https://developer.nvidia.com/cuda/) (for Nvidia GPUs) or [ROCm](https://www.amd.com/en/products/software/rocm.html) (for AMD GPUs), OS, python and onnxruntime versions. 
 
@@ -57,7 +60,7 @@ For AMD GPU inference with ROCm 7.0, try:
 
 Take a note, that _onnxruntime-gpu_ and _onnxruntime-rocm_ will fall back to CPU-mode if GPU initialisation failed. 
 
-For compatability with other versions of CUDA and ROCm see coresponding tables:
+For compatibility with other versions of CUDA and ROCm see corresponding tables:
 
 [CUDA](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)
 
@@ -74,10 +77,10 @@ For compatability with other versions of CUDA and ROCm see coresponding tables:
 
 #### Optinal arguments:
 
-* `-t`: Implements a different model trained for detecting collonies on transilluminated plates (see image3 and 4 in examples)
-* `-b`: Creats finer grid during tiling procedure, preserving higher resolution of image during inference. May improve detection of small colonies but also slow down inference if run on cpus-only.
-* `--no-crop`: Skipps cropping of images. Usfull if cropping fails or plates are not circular
-* `--extra`: Preserves and saves some intermediate stages of image processing: cropped images, tiles before demultiplication, tiles after demultiplication. Significantly slowdown inference.
+* `-t`: Trans-illumination mode. Implements a different model trained for detecting colonies on trans-illuminated plates (see image3 and 4 in examples)
+* `-b`: Improves inference speed with marginal change in counting precision. 
+* `--no-crop`: Skips cropping of images. Useful if cropping fails or plates are not circular
+* `--extra`: Saves intermediate stages of image processing as images and tables: cropped images, tiles before deduplication, tiles after deduplication. Significantly slowdown inference. Recommended only for testing
 
 #### Results include:
 - images of plates with drown boxes
@@ -90,17 +93,33 @@ For the first run we recomend to test the tool on the single image. Or you can t
 
     python agar3000.py demo demo/results
     
-for transilluminated plates:
+for trans-illuminated plates:
 
     python agar3000.py demo_t demo_t/results
 
 
-<img src="_img2.png"/>
+<img src="samples.png"/>
 
+## Pipeline 
 
 ## QnA
 
---TBD--
+Which side of the plate has to be photographed?
+From the lid side. That's how the model was trained and tested.
+
+There is condensate under the lid. What do I have to do?
+Open the lid. The condensate may partially or completely  obscure the surface of agar.  Unfortunately we haven't found better solution then simply open the lid. Use laminar flow if required.
+
+Which illumination of the plate is an adequate one?
+The light has to be homogenous to prevent reflection artefacts. We used a LED-panel with diffuser.
+
+What is trans-illumination and is it better? 
+Trans-illumination is simply illumination of a transparent plate from behind,  
+
+Is hyper-trading beneficial for inference speed?
+No. In our tests it significantly slow down inference.
+
+
 
 
 ## License
