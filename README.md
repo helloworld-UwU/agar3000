@@ -1,6 +1,6 @@
 <img src="logo.png" alt="drawing"/>
 
-**Yes, it's AI!**
+**Yes, it's an AI!**
 
 A tool that automatically detects and counts colonies on images of agar plates.
 
@@ -8,8 +8,8 @@ Think automated colony counting isn't for you 🤨? Your plates are too "wild" f
 Take a photo with your smartphone and let agar3000 prove you wrong.
 
 
-- No fine-tuning  or supervision required. Just an input path with your images and an output path for results
-- Can analyse up to 20 images per minute in CPU-mode and up to 65 with GPU acceleration.
+- No fine-tuning  or supervision required. Just an input path with your images and an output path for the results
+- It can analyse up to 20 images per minute in CPU-only mode and up to 65 with GPU acceleration.
 
 
 ## Requirements
@@ -18,17 +18,17 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
-2. Images should be taken against a uniform background and under adequate lighting conditions. The plate must occupy the majority of the image (at least two-thirds of the frame when comparing the plate diameter to the shorter side of the image) and be in sharp focus.
-3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has certain tolerance for bubbles within the agar.
+2. Images should be taken against a uniform background and under adequate lighting. The plate must be in sharp focus, and occupy the majority of the image (at least two-thirds of the shorter side of the image) and be in sharp focus.
+3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has some tolerance for bubbles in the media.
 4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on unusually looking media.
-5. The recommended minimum image resolution is 2048 × 2048 pixels; higher resolutions will not improve results.
-6. Supported image formats are JPG, PNG, TIFF, BMP (any formats supported by opencv)
+5. The recommended minimum image resolution is 2048 × 2048 pixels. Higher resolutions do not affect the results, as images are downscaled internally.
+6. Supported image formats are JPG, PNG, TIFF, BMP (any formats supported by **opencv**)
 
 ### Hardware
-Agar3000 can run on any x86-based system operating under **Windows or Linux** and requires up to 1G of RAM. It can also utilise a compatible GPU to significantly accelerate computations.
+agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1G of RAM. It works without a GPU but can also utilise a GPU to significantly accelerate computations.
 
-- NVIDIA GPUs are supported via CUDA (with cuDNN), starting from the Maxwell architecture and newer (e.g., GTX 780 Ti, 900 series and above), on both Linux and Windows systems.
-- AMD GPUs are supported via ROCm, starting from the Vega architecture (e.g., RX Vega, RX 5000 series and newer), on Linux only.
+- **NVIDIA GPUs** are supported via CUDA (with cuDNN), starting from the Maxwell architecture onwards (e.g., GTX 780 Ti, GTX 900 series and above), on both Linux and Windows systems.
+- **AMD GPUs** are supported via ROCm, starting from the Vega architecture onwards (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
 <img src="speed.png"/>
 </details>
@@ -36,17 +36,19 @@ Agar3000 can run on any x86-based system operating under **Windows or Linux** an
 
 
 
-## Get started
-Agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+## Getting started
+agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ### CPU-mode:
+The CPU-mode is the simplest way to install, test and use agar3000, provided that slower inference is acceptable.
 
-    pip install opencv-python onnxruntime
-
+```bash
+pip install opencv-python onnxruntime
+```
 
 ### GPU-mode:
 
-!!WARNING!! To set up a GPU-mode can be tricky and we don't recommend unless the inference speed is necessary.
+To set up a GPU-mode can be tricky and we don't recommend unless the inference speed is necessary.
 
 GPU inference requires matching of GPU, [CUDA+cuDNN](https://developer.nvidia.com/cuda/) (for Nvidia GPUs) or [ROCm](https://www.amd.com/en/products/software/rocm.html) (for AMD GPUs), OS, python and onnxruntime versions. 
 
@@ -75,16 +77,16 @@ For compatibility with other versions of CUDA and ROCm see corresponding tables:
 * `input_path`: Path to the folder with images of plates. Non-recursive: files in nested subdirectories are not processed. Input_path can be a single image file.
 * `output_path`: Path to the folder where results will be saved. It will be created automatically if not exist.
 
-#### Optinal arguments:
+#### Optinal flags:
 
-* `-t`: Trans-illumination mode. Implements a different model trained for detecting colonies on trans-illuminated plates (see image3 and 4 in examples)
+* `-t`: Trans-illumination mode. Implements a different model trained for detecting colonies on trans-illuminated plates (see image3 and 4 in examples below)
 * `-b`: Improves inference speed with marginal change in counting precision. 
 * `--no-crop`: Skips cropping of images. Useful if cropping fails or plates are not circular
-* `--extra`: Saves intermediate stages of image processing as images and tables: cropped images, tiles before deduplication, tiles after deduplication. Significantly slowdown inference. Recommended only for testing
+* `--extra`: Saves representation of intermediate stages of image processing as images and tables: cropped images, tiles before deduplication, tiles after deduplication. Significantly slowdown inference. Recommended only for testing
 
 #### Results include:
-- images of plates with drown boxes
-- csvs with annotation for each file/plate
+- images of each plate with drown boxes
+- csvs with annotation for each plate
 - RESULTS.csv with the number of colonies for each file/plate
 - agar3000_[timestamp].log
   
@@ -100,7 +102,7 @@ for trans-illuminated plates:
 
 <img src="samples.png"/>
 
-## Pipeline 
+## Pipeline (TBD)
 
 ## QnA
 
@@ -119,6 +121,18 @@ The light has to be homogenous to prevent reflection artefacts. We used a LED-pa
 *What is trans-illumination and is it better?* 
 
 Trans-illumination is simply illumination of a transparent plate from behind,  
+
+
+*How small has to be a colony to be too small for detection?*
+
+The size of the colony has to at least 8px in diameter, but the real performance may depend on multiple factors. So we recommend to check results if there is some suspictions
+
+
+*Which media considered as unusually looking media*
+agar3000 was tested on different media and we noticed drop of precision with some plates on media with not trivial colours: blood agar and chocolate agar. The good performance on such media may depend on colonies morphology and not guaranteed  
+
+*What is the optimal number of colonies per plate?*
+agar3000 was tested on plates with up to 300 colonies. However the maximum theoretical limitation is 1600 colonies per plate. We recommend to use plates with 10-300 colonies for good precision. 
 
 *Is hyper-trading beneficial for inference speed?*
 
@@ -145,8 +159,7 @@ Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawl
 Dataset source: https://agar.neurosys.com/
 
 We gratefully acknowledge the authors and contributors for making this dataset publicly available.
-
-# 
-Special thanks to @dedovskaya for sharing a model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
+ 
+Special thanks to @dedovskaya for sharing code and model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
 
 If agar3000  was usefull for you, don't forget to recommend it your collegues and to mention it in your papers. Thanks for testing!
