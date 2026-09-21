@@ -172,7 +172,7 @@ Dataset source: https://agar.neurosys.com/
 
 We gratefully acknowledge the authors and contributors for making this dataset publicly available.
 
-Special thanks to @dedovskaya for sharing code and model that was used during the early development stage: https://github.com/dedovskaya/CFUCounter
+Special thanks to @dedovskaya for sharing the model used during the early development: https://github.com/dedovskaya/CFUCounter
 
 ---
-If agar3000  was usefull for you, don't forget to recommend it your collegues and to mention it in your papers. Thanks for testing!
+If agar3000  was useful for you, don't forget to recommend it to your colleagues and mention it in your publications. Thanks for testing!
