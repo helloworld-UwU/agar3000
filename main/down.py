@@ -35,13 +35,22 @@ def summarize_colonies(csv_folder, output_path="RESULTS.csv"):
         writer = csv.writer(f)
         writer.writerow(["Plate", "Colonies"])
         writer.writerows(summary)
+
     print("-----------------------------------------------------")
-    print("RESULTS:")
     with open(output_path, "r", encoding="utf-8") as f:
         rows = [line.rstrip().split(",") for line in f if line.strip()]
     col_widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
-    for row in rows:
+
+    header, data_rows = rows[0], rows[1:]
+    if len(data_rows) <= 10:
+        print("RESULTS:")
+        display_rows = rows
+    else:
+        print("First 10 plates:")
+        display_rows = [header] + data_rows[:10]
+
+    for row in display_rows:
         print("  " + "  ".join(cell.ljust(col_widths[i]) for i, cell in enumerate(row)))
-    
-    print(f"Summary CSV-table saved to: {output_path}")
+
+    print(f"Summary saved to: {output_path}")
 

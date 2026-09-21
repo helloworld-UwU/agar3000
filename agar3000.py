@@ -101,6 +101,7 @@ def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
             tiles = detect_on_tiles(tiles, rcnn, size=scale, conf=score, normalize=True, rgb=False)
             print(f"Detection finished: {plate.sample_id} ({timestamp()})")
             print("-----------------------------------------------------")
+            print(f"Deduplication started:  {plate.sample_id} ({timestamp()})")
 
             if extra:
                 ext_out = os.path.join(output_path, "dup")
@@ -123,6 +124,7 @@ def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
                                             name=plate.sample_id, output_folder=ext_out)
                 tiling.save_plate_tiles_to_csv(ext_out, tiles, name=plate.sample_id)
             print(f"Deduplication finished: {plate.sample_id} ({timestamp()})")
+            print("-----------------------------------------------------")
             
             tiling.filter_colonies_by_score(tiles, threshold=score, detections_key="colonies", 
                                             score_regression=score_regression)
@@ -145,7 +147,8 @@ def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
 # CLI
 # ----------------------------------------------------------------------
 
-def main():
+
+def parse_args():
     p = argparse.ArgumentParser(
         epilog=(
             "Try it with the demo data:\n"
@@ -159,40 +162,63 @@ def main():
     p.add_argument("output_path", type=str,
                    help="path for results")
     p.add_argument("-t", action="store_true",
-                   help="use if your plates are transilluminated")
+                   help="use if your plates are trans-illuminated")
     p.add_argument("-b", action="store_true",
-                   help="let program think more to get better precision")
-    p.add_argument("--extra", action="store_true", 
-                   help="get more of intermediate output")
-    p.add_argument("--no-crop",action="store_true", 
+                   help="faster inference at the cost of a slight loss of precision")
+    p.add_argument("--extra", action="store_true",
+                   help="get more of intermediate output (slow)")
+    p.add_argument("--no-crop", action="store_true",
                    help="skip plate cropping (use for non-circular plates)")
-    
-    p.add_argument("--model",      type=str,   default="model/frcnn_lr.onnx",  help=argparse.SUPPRESS)
-    p.add_argument("--rows",       type=int,   default=3,                      help=argparse.SUPPRESS)
-    p.add_argument("--cols",       type=int,   default=3,                      help=argparse.SUPPRESS)
-    p.add_argument("--overlap",    type=float, default=0.1,                    help=argparse.SUPPRESS)
-    p.add_argument("--tol",        type=int,   default=3,                      help=argparse.SUPPRESS)
-    p.add_argument("--scale",      type=int,   default=512,                    help=argparse.SUPPRESS)
-    p.add_argument("--score",      type=float, default=0.20,                   help=argparse.SUPPRESS)    
-    p.add_argument("--mem-debug",  action="store_true",                        help=argparse.SUPPRESS)
-    p.add_argument("--validation", action="store_true",                        help=argparse.SUPPRESS)
-    p.add_argument("--ref",        type=str,   default="ref.csv",              help=argparse.SUPPRESS)
-    p.add_argument("--margin",     type=float, default=1,                      help=argparse.SUPPRESS)
-    p.add_argument("--ld",         type=float, default=0.05,                   help=argparse.SUPPRESS)
-    p.add_argument("--hd",         type=float, default=-0.10,                  help=argparse.SUPPRESS)
+
+    # Crucial fix: Changed default=None so we can detect if the user actually passed a value
+    p.add_argument("--model",      type=str,   default=None,    help=argparse.SUPPRESS)
+    p.add_argument("--rows",       type=int,   default=None,    help=argparse.SUPPRESS)
+    p.add_argument("--cols",       type=int,   default=None,    help=argparse.SUPPRESS)
+    p.add_argument("--overlap",    type=float, default=0.1,     help=argparse.SUPPRESS)
+    p.add_argument("--tol",        type=int,   default=3,       help=argparse.SUPPRESS)
+    p.add_argument("--scale",      type=int,   default=512,     help=argparse.SUPPRESS)
+    p.add_argument("--score",      type=float, default=None,    help=argparse.SUPPRESS)
+    p.add_argument("--mem-debug",  action="store_true",         help=argparse.SUPPRESS)
+    p.add_argument("--validation", action="store_true",         help=argparse.SUPPRESS)
+    p.add_argument("--ref",        type=str,   default="ref.csv",help=argparse.SUPPRESS)
+    p.add_argument("--margin",     type=float, default=1,       help=argparse.SUPPRESS)
+    p.add_argument("--ld",         type=float, default=None,    help=argparse.SUPPRESS)
+    p.add_argument("--hd",         type=float, default=None,    help=argparse.SUPPRESS)
+
     args = p.parse_args()
+
+    # 1. define the matrix of defaults based on flags (b, t)
+    # Format: (has_b, has_t) -> {defaults dict}
+    DEFAULTS_MATRIX = {
+        (False, False): {"ld": 0.05, "hd": -0.15, "score": 0.35, "rows": 4, "cols": 4, "model": "model/frcnn_lr.onnx"},
+        (False, True):  {"ld": None,  "hd": None,   "score": 0.45, "rows": 4, "cols": 4, "model": "model/frcnn_hr.onnx"},
+        (True, False):  {"ld": 0.05, "hd": -0.10, "score": 0.20, "rows": 3, "cols": 3, "model": "model/frcnn_lr.onnx"},
+        (True, True):   {"ld": None,  "hd": None,   "score": 0.30, "rows": 3, "cols": 3, "model": "model/frcnn_hr.onnx"}
+    }
+
+    # 2. select the matching baseline dictionary based on active flags
+    selected_defaults = DEFAULTS_MATRIX[(args.b, args.t)]
+
+    # 3. apply defaults ONLY if the user left the argument completely blank (None)
+    for key, default_value in selected_defaults.items():
+        if getattr(args, key) is None:
+            setattr(args, key, default_value)
+
+    # 4. regression depends on the newly assigned or user values
+    args.regression = tiling.regression_from_score(
+        args.score, 
+        low_delta=args.ld, 
+        high_delta=args.hd
+    )
+
+    return args
+
+
+
+
+def main():
     
-    regression = "y = -0.000517x + 0.255172"
-    
-    if args.t:
-        args.model = "model/frcnn_hr.onnx"
-        args.score = 0.20 
-        regression = "y = -0.000517x + 0.255172"
-    if args.b:
-        args.rows = 4
-        args.cols = 4
-        args.score = 0.20
-        regression = "y = -0.000517x + 0.255172"
+    args = parse_args()
 
     # --- Input validation  ---
     EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
@@ -223,28 +249,34 @@ def main():
         print("=====================================================")
         print("Agar3000 v0.2.2")
         print("=====================================================")
-        print("Configuration:")
+        print("Configurations:")
         print(f"  Input                   : {args.input_path}")
         print(f"  Output folder           : {args.output_path}")
-        print(f"  Mode                    : {'Transillumination' if args.t else 'Surface illumination'}")
+        print(f"  Mode                    : {'Trans-illumination' if args.t else 'Epi-illumination'}")
         print(f"  Model                   : {args.model}")
+        print(f"  Extra output            : {args.extra}")
+        
         if args.no_crop:
             print(f"  No-crop mode        : {args.no_crop}")
         else:
+            print("  --- Cropping ---")
             print(f"  Plate margin offset : {args.margin}")
+        
+        print("  --- Tiling ---")
         print(f"  Grid                    : {args.rows} rows x {args.cols} cols")
         print(f"  Overlap                 : {args.overlap}")
         print(f"  Tolerance               : {args.tol}")
         print(f"  Scale                   : {args.scale}")
         print(f"  Min. score filter       : {args.score}")
-        print(f"  Corection regression    : {regression}")
-        print(f"  Extra mode              : {args.extra}")
-        print("  --- Validation ---")
-        print(f"  Validation mode         : {args.validation}")
-        print(f"  Reference CSV           : {args.ref}")
-        print("=====================================================")
-        print(f"Log: {log_path}")
+        print(f"  Corection regression    : {args.regression}")
+        
+        if args.validation:
+            print("  --- Validation ---")
+            print(f"  Validation mode         : {args.validation}")
+            print(f"  Reference CSV           : {args.ref}")
         print("-----------------------------------------------------")
+        print(f"Log: {log_path}")
+        print("=====================================================")
 
         run_folder_pipeline(
             input_path    = args.input_path,

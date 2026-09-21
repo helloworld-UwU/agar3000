@@ -60,12 +60,6 @@ class Plate:
     
     def find_circle_mask(self, img, margin=None, detect_size=512, **kwargs):
         """
-        Robust, fast petri-dish circle detection.
-
-        Replaces the old threshold/alpha/beta approach with a parameter-free
-        pipeline. Legacy keyword arguments (threshold, alpha, beta) are
-        accepted but silently ignored so existing call sites keep working.
-
         Constraints exploited:
           - Plate diameter >= 2/3 of the image short side
           - Plate is roughly centered (center within 25% of short side)
@@ -207,7 +201,7 @@ class Plate:
         """
         Correct uneven illumination by fitting a polynomial background.
 
-        Memory-efficient: the least-squares fit is performed on a small
+        The least-squares fit is performed on a small
         downsampled copy (fit_size px on the short side), then the resulting
         polynomial is evaluated directly on the full-resolution coordinate
         grid -- no large design matrix is ever allocated at full resolution.

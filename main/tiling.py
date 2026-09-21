@@ -123,6 +123,28 @@ def show_all_tiles_with_boxes(tiles_detections, key="tile_with_boxes",
                 [cv2.IMWRITE_JPEG_QUALITY, 95])
 
 # %%
+def regression_from_score(base_score, min_count=10, max_count=300,
+                           low_delta=None, high_delta=None):
+    """
+    Derive (slope, intercept) such that:
+      y(min_count) = base_score + low_delta
+      y(max_count) = base_score + high_delta
+
+    Returns (slope, intercept) for:  corrected_score = slope * count + intercept
+    """
+
+    if low_delta is None or high_delta is None:
+        return None
+    
+    else:
+        y_low  = base_score + low_delta
+        y_high = base_score + high_delta
+    
+        slope     = (y_high - y_low) / (max_count - min_count)
+        intercept = y_low - slope * min_count
+     
+        return f"corrected_score = ({slope:.6f} * count) + {intercept:.4f}"
+
 def filter_colonies_by_score(
     tiles,
     threshold,
@@ -134,7 +156,7 @@ def filter_colonies_by_score(
 ):
     thr = float(threshold)
 
-    if score_regression is None:
+    if not score_regression or None in score_regression:
         for d in tiles.values():
             dets = d.get(detections_key, [])
             d[detections_key] = [det for det in dets if det.get("score", 0.0) >= thr]
@@ -169,7 +191,8 @@ def filter_colonies_by_score(
         d[detections_key] = [det for det in dets if det.get("score", 0.0) >= corrected]
 
     return corrected
-        
+
+
 # %%
 
 def iou_yxyx(a, b):
@@ -198,34 +221,15 @@ def merge_rois_yxyx(a, b):
     by1, bx1, by2, bx2 = b
     return (min(ay1, by1), min(ax1, bx1), max(ay2, by2), max(ax2, bx2))
 
-def merge_with_best_iou(ref_roi, roi_list):
-    """
-    Picks roi from roi_list with maximal IoU vs ref_roi, merges them,
-    removes the chosen roi from the list, and returns (merged_roi, new_list).
-
-    ROI format: (y1,x1,y2,x2)
-    """
-    if not roi_list:
-        return ref_roi, []
-
-    best_i = 0
-    best_iou = -1.0
-    for i, roi in enumerate(roi_list):
-        v = iou_yxyx(ref_roi, roi)
-        if v > best_iou:
-            best_iou = v
-            best_i = i
-
-    best_roi = roi_list[best_i]
-    merged = merge_rois_yxyx(ref_roi, best_roi)
-    new_list = roi_list[:best_i] + roi_list[best_i + 1:]
-    return merged, new_list
-
 def resolve_overlap_pair(
     primary_dets, secondary_dets,
     bbox_primary, bbox_secondary,
     position="x", tol=5, merge_key="merge"
 ):
+    """
+    Returns (new_primary, new_secondary, removed, merged) — counts are
+    returned rather than printed, so callers can aggregate them.
+    """
     px0, py0, px1, py1 = bbox_primary
     sx0, sy0, sx1, sy1 = bbox_secondary
 
@@ -307,32 +311,46 @@ def resolve_overlap_pair(
     new_primary = primary_keep
     new_secondary = secondary_keep + secondary_merge
 
-    print(f"removed={removed}, merged={merged}")
-    return new_primary, new_secondary
+    return new_primary, new_secondary, removed, merged
 
 # %%
+def print_summary(summary):
+    """
+    Prints an aggregate report from the per-pair records produced by
+    resolve_duplicates_across_tiles: pairs processed, horizontal/vertical
+    breakdown, and grand totals.
+    """
+    total_removed = sum(s["removed"] for s in summary)
+    total_merged = sum(s["merged"] for s in summary)
+
+    print(f"Tile pairs processed: {len(summary)}")
+    print(f"removed={total_removed}, merged={total_merged}")
+
 def resolve_duplicates_across_tiles(tiles, tol=5, detections_key="colonies"):
     """
     Infers grid size from tiles keys (row, col).
-    Updates tiles in-place (silent): horizontal neighbors first, then vertical.
+    Updates tiles in-place: horizontal neighbors first, then vertical.
+    Prints one aggregate summary at the end (not per-pair) and returns
+    the per-pair records, e.g. for pd.DataFrame(summary).
     """
     if not tiles:
-        return
+        return []
 
     rows = max(r for (r, c) in tiles.keys()) + 1
     cols = max(c for (r, c) in tiles.keys()) + 1
+
+    summary = []
 
     # ---- horizontal neighbors ----
     for r in range(rows):
         for c in range(cols - 1):
             if (r, c) not in tiles or (r, c + 1) not in tiles:
                 continue
-            print(f"Resolve overlap pair: ({r},{c}),({r},{c+1}) ->", end="")
-            
+
             left = tiles[(r, c)]
             right = tiles[(r, c + 1)]
 
-            new_left, new_right = resolve_overlap_pair(
+            new_left, new_right, removed, merged = resolve_overlap_pair(
                 left.get(detections_key, []),
                 right.get(detections_key, []),
                 left["bbox"], right["bbox"],
@@ -341,17 +359,23 @@ def resolve_duplicates_across_tiles(tiles, tol=5, detections_key="colonies"):
             left[detections_key] = new_left
             right[detections_key] = new_right
 
+            summary.append({
+                "pair": ((r, c), (r, c + 1)),
+                "axis": "x",
+                "removed": removed,
+                "merged": merged,
+            })
+
     # ---- vertical neighbors ----
     for r in range(rows - 1):
         for c in range(cols):
             if (r, c) not in tiles or (r + 1, c) not in tiles:
                 continue
-            
-            print(f"Resolve overlap pair: ({r},{c}),({r+1},{c}) ->", end="")
+
             top = tiles[(r, c)]
             bottom = tiles[(r + 1, c)]
 
-            new_top, new_bottom = resolve_overlap_pair(
+            new_top, new_bottom, removed, merged = resolve_overlap_pair(
                 top.get(detections_key, []),
                 bottom.get(detections_key, []),
                 top["bbox"], bottom["bbox"],
@@ -359,6 +383,17 @@ def resolve_duplicates_across_tiles(tiles, tol=5, detections_key="colonies"):
             )
             top[detections_key] = new_top
             bottom[detections_key] = new_bottom
+
+            summary.append({
+                "pair": ((r, c), (r + 1, c)),
+                "axis": "y",
+                "removed": removed,
+                "merged": merged,
+            })
+
+    print_summary(summary)
+    return summary
+
 
 # %%
 
