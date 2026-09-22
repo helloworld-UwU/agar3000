@@ -121,11 +121,11 @@ python agar3000.py demo_t demo_t/results
 
 **Which side of the plate should be photographed?**
 
-The lid side. The model was trained and tested on images taken from this side.
+The lid side. Position the plate so that the lid faces the camera. The model was trained and tested only on images captured from this side, ensuring optimal accuracy.
 
 **What should I do if there is condensation under the lid?**
 
-Open the lid. Condensation can partially or completely obscure the agar surface. Use laminar flow if sterility is required.
+To open the lid before photographing is the simplest approach to this problem. Condensation can obscure colonies and interfere with detection. If sterility is required, open the lid in laminar flow.
 
 **Which lighting of the plate is an adequate one?**
 
