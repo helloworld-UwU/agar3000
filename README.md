@@ -147,6 +147,10 @@ agar3000 was tested on several media. Precision dropped on some plates with non-
 **What is the optimal number of colonies per plate?**
 We recommend 10–300 colonies per plate for good precision. However, the theoretical maximum is 1,600 colonies per plate.
 
+**How the colour depth may influence analysis?**
+TBD
+
+
 **Does hyper-threading improve inference speed?**
 
 No. In our tests, hyper-threading slowed down inference. We recommend disabling hyper-threading if this option is available for your computational setup. 
