@@ -18,7 +18,7 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
-2. Images should be taken against a uniform background and under adequate lighting. The plate must be in sharp focus, and occupy the majority of the image (at least two-thirds of the shorter side of the image) and be in sharp focus.
+2. Images should be taken against a uniform background and under adequate lighting. The plate must be in sharp focus, and occupy the majority of the image (at least two-thirds of the shorter side of the image).
 3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has some tolerance for bubbles in the media.
 4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on unusually looking media.
 5. The recommended minimum image resolution is 2048 × 2048 pixels. Higher resolutions do not affect the results, as images are downscaled internally.
@@ -142,9 +142,11 @@ Colonies must be at least 8 px in diameter. Actual performance may depend on sev
 
 
 **Which media count as unusual-looking?**
+
 agar3000 was tested on several media. Precision dropped on some plates with non-standard colours, such as blood agar and chocolate agar. Performance on such media may depend on colony morphology and is not guaranteed.  
 
 **What is the optimal number of colonies per plate?**
+
 We recommend 10–300 colonies per plate for good precision. However, the theoretical maximum is 1,600 colonies per plate.
 
 **Does hyper-threading improve inference speed?**
