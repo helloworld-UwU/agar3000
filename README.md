@@ -95,8 +95,7 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
 * `--extra`: saves intermediate processing stages as images and tables (cropped images, tiles before deduplication and tiles after deduplication). Significantly slows down inference. Recommended only for testing
 
-#### Results include:
-The output folder contains:
+#### Results:
 - an image of each plate with boxes drawn around the colonies
 - a CSV file with the annotations for each plate
 - RESULTS.csv with the number of colonies for each plate
@@ -167,8 +166,7 @@ No. In our tests, hyper-threading slowed down inference. We recommend disabling 
 ## References
 The models were trained using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
 
-Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., and Drulis-Kawa, Z.
-“AGAR: A Microbial Colony Dataset for Deep Learning Detection” (2021).
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630, 129654. [10.1016/j.neucom.2025.129654](10.1016/j.neucom.2025.129654)
 
 Dataset source: https://agar.neurosys.com/
 
