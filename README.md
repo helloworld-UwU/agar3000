@@ -166,7 +166,7 @@ No. In our tests, hyper-threading slowed down inference. We recommend disabling 
 ## References
 The models were trained using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
 
-Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630, 129654. [10.1016/j.neucom.2025.129654](10.1016/j.neucom.2025.129654)
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630,[10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
 
 Dataset source: https://agar.neurosys.com/
 
