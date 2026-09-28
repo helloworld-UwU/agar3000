@@ -37,10 +37,10 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 
 
 ## Getting started
-agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+agar3000 requires **python** (>=v3.7, <=3.14.4) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ```bash
-conda create -n agar3000 python
+conda create -n my_env python=3.14.4
 conda activate agar3000
 ```
 
