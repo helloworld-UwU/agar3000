@@ -37,10 +37,10 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 
 
 ## Getting started
-agar3000 requires **python** (>=v3.7, <=3.14.4) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+agar3000 requires **python** (>=v3.7, <=3.14.8) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ```bash
-conda create -n agar3000 python=3.14.4
+conda create -n agar3000 python=3.14.8
 conda activate agar3000
 ```
 
@@ -90,7 +90,7 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 
 #### Optinal flags:
 
-* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 3 and 4 in the examples below).
+* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 2 and 3 in the examples below).
 * `-b`: increases inference speed with a marginal change in counting precision. 
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
 * `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
