@@ -93,23 +93,24 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 * `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 3 and 4 in the examples below).
 * `-b`: increases inference speed with a marginal change in counting precision. 
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
-* `--extra`: saves intermediate processing stages as images and tables (cropped images, tiles before deduplication and tiles after deduplication). Significantly slows down inference. Recommended only for testing
+* `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
 
 #### Results:
-- an image of each plate with boxes drawn around the colonies
-- a CSV file with the annotations for each plate
-- RESULTS.csv with the number of colonies for each plate
-- a log file, agar3000_[timestamp].log
+- *predictions/*:an image of each plate with boxes drawn around the colonies
+- *predictions.json*: joined annotation in COCO formate for the entire batch
+- *SUM.csv*: the number of colonies per plate
+- *agar3000_[timestamp].log*: log-file
+- *extra/*: extra render, if selected (see flags above)
   
 
 For a first run, we recommend testing the tool on a single image or running the included demo:
 
 ```bash
-python agar3000.py demo demo/results
+python agar3000.py demo/epi demo/epi/results
 ```    
 for trans-illuminated plates:
 ```bash
-python agar3000.py demo_t demo_t/results
+python agar3000.py demo/tra demo/tra/results -t
 ```    
 
 <img src="fig/samples.png"/>
@@ -148,10 +149,6 @@ agar3000 was tested on several media. Precision dropped on some plates with non-
 
 We recommend 10–300 colonies per plate for good precision. However, the theoretical maximum is 1,600 colonies per plate.
 
-**How the colour depth may influence analysis?**
-TBD
-
-
 **Does hyper-threading improve inference speed?**
 
 No. In our tests, hyper-threading slowed down inference. We recommend disabling hyper-threading if this option is available for your computational setup. 
@@ -168,13 +165,14 @@ No. In our tests, hyper-threading slowed down inference. We recommend disabling 
 - **Model weights:** CC BY-NC 4.0 — non-commercial use only
 
 ## References
-The models were trained using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
 
-Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630,[10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
+The models were trained on HPC using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
+
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630. [10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
 
 Dataset source: https://agar.neurosys.com/
 
-We gratefully acknowledge the authors and contributors for making this dataset publicly available.
+Computational workloads were executed using the [LEO5 high-performance computing infrastructure at the University of Innsbruck] (https://www.uibk.ac.at/en/zid/systeme/hpc-systeme/leo5/)
 
 Special thanks to @dedovskaya for sharing the model used during the early development: https://github.com/dedovskaya/CFUCounter
 
