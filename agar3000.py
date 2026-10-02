@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 
+BANNER = (r"""
+ █████╗   ██████╗  █████╗ ██████╗
+██╔══██╗ ██╔════╝ ██╔══██╗██╔══██╗
+███████║ ██║  ███╗███████║██████╔╝
+██╔══██║ ██║   ██║██╔══██║██╔══██╗
+██║  ██║ ╚██████╔╝██║  ██║██║  ██║
+╚═╝  ╚═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+
+ ██████╗  ██████╗  ██████╗  ██████╗
+ ╔═══██╝ ██╔═████╗██╔═████╗██╔═████╗
+ █████╗  ██║██╔██║██║██╔██║██║██╔██║
+ ╚═══██╗ ████╔╝██║████╔╝██║████╔╝██║
+██████╔╝ ╚██████╔╝╚██████╔╝╚██████╔╝
+╚═════╝   ╚═════╝  ╚═════╝  ╚═════╝
+""")
+
 from datetime import datetime
 def timestamp():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -11,13 +27,19 @@ import gc
 import glob
 import sys
 import cv2
+import csv
+import shutil
+
 
 # Lockal import
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+from main.data import Plate
 import main.tiling as tiling
+import main.render as render
 from main.detect_frcnn_onnx import load_model, detect_on_tiles
-from main.process import process_plate
-from main.down import summarize_colonies
+from main.plate import process_plate
+from main.dedup import resolve_duplicates
+from main.filtering import filter_by_score, regression_from_score
 
 
 # ----------------------------------------------------------------------
@@ -57,13 +79,13 @@ def setup_logging(output_folder):
 # Pipeline
 # ----------------------------------------------------------------------
 
-def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
+def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
                         grid=(2, 2), overlap=0.2,
                         tol=5, scale=1024, score=0.25, extra=False,
                         mem_debug=False, no_crop=False, margin = 1, score_regression=None):
 
-    
-
+     
+    counts = []
     try:
         if not os.path.exists(input_path):
             raise FileNotFoundError(f"Input path/file does not exist: {input_path}")
@@ -81,68 +103,143 @@ def run_folder_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
         
         rcnn = load_model(model)
         
+        os.makedirs(output_path, exist_ok=True)
+        
+        
+        
+        sum_path = os.path.join(output_path, "SUM.csv")
+
+        sum_file = open(sum_path, "w", newline="")
+        sum_writer = csv.writer(sum_file)
+        sum_writer.writerow(["Plate", "Colonies"])
+        sum_file.flush()
+        
+        
         for img_path in sorted(img_paths):
+            
+            # --- (1) LOADING IMAGE -------------------------------------------
+            
             print("-----------------------------------------------------")
             print("-----------------------------------------------------")
             print(f"PROCESSING: {os.path.basename(img_path)} ({timestamp()})")
             print("-----------------------------------------------------")
 
-            plate = process_plate(img_path, margin=margin)
+            image = cv2.imread(img_path)
+            if image is None:
+                print(f"ERROR: Could not load image at {img_path}")
+                continue
+
+            sample_id = os.path.splitext(os.path.basename(img_path))[0]
+            
+            extra_path = os.path.join(output_path, "extra", sample_id)
+
+            plate = Plate(sample_id=sample_id, image_path=img_path, image=image)
+
+            # --- (2) PLATE DETECTION -----------------------------------------
+
             if no_crop:
                 plate.cropped = plate.image
-            elif extra:
-                ext_out = os.path.join(output_path, "crop")
-                os.makedirs(ext_out, exist_ok=True)
-                cv2.imwrite(os.path.join(ext_out, f"{plate.sample_id}.png"), plate.cropped)
-
-            tiles = tiling.make_tiles(plate.cropped, grid=grid, overlap=overlap)
+            
+            else:
+                plate.cropped, plate.crop_bbox = process_plate(plate.image,
+                                                           margin=margin)
+            
+                
+            # --- (3) TILING --------------------------------------------------
+            tiling.make_tiles(plate,
+                              grid=grid,
+                              overlap=overlap)
+            
+            if extra:
+                render.save_geometry(plate, extra_path, 
+                                     name="1_" + plate.sample_id + "_geometry")
+                
+                
+            # --- (4) COLONY DETECTION ------------
 
             print(f"Detection started:  {plate.sample_id} ({timestamp()})")
-            tiles = detect_on_tiles(tiles, rcnn, size=scale, conf=score, normalize=True, rgb=False)
+            
+            detect_on_tiles(plate.tiles, rcnn, size=scale, conf=score, normalize=True, rgb=True)
+            
+            if extra:
+                render.show_tiles(plate, extra_path,
+                  name="2_" + plate.sample_id + "_duplicated")
+                render.save_csv(plate, extra_path,
+                                name="2_" + plate.sample_id + "_duplicated")
+                
+            
             print(f"Detection finished: {plate.sample_id} ({timestamp()})")
             print("-----------------------------------------------------")
             print(f"Deduplication started:  {plate.sample_id} ({timestamp()})")
 
-            if extra:
-                ext_out = os.path.join(output_path, "dup")
-                tiling.show_all_tiles_with_boxes(tiles, key="tile_with_boxes",
-                                                 cols=None,
-                                                 output_folder=ext_out,
-                                                 name=f"{plate.sample_id}_tiles")
-                tiling.save_plate_tiles_to_csv(ext_out, tiles, name=plate.sample_id)
 
-            tiling.resolve_duplicates_across_tiles(tiles, tol=tol, detections_key="colonies")
+
+            resolve_duplicates(plate.tiles, tol=tol)
 
             if extra:
-                ext_out = os.path.join(output_path, "dedup")
-                tiling.show_all_tiles_with_boxes(tiles, key="tile_with_boxes",
-                                                 cols=None,
-                                                 output_folder=ext_out,
-                                                 name=f"{plate.sample_id}_tiles")
-                tiling.show_all_rois_global(plate.cropped, tiles, detections_key="colonies",
-                                            color=(0, 0, 255), thickness=2,
-                                            name=plate.sample_id, output_folder=ext_out)
-                tiling.save_plate_tiles_to_csv(ext_out, tiles, name=plate.sample_id)
+                render.show_tiles(plate, extra_path,
+                                  name="3_" + plate.sample_id + "_deduplicated")
+                render.save_csv(plate, extra_path,
+                                name="3_" + plate.sample_id + "_deduplicated")
+                render.show_colonies(plate, extra_path,
+                                     name="4_" + plate.sample_id + "_joined")
+                
+                
             print(f"Deduplication finished: {plate.sample_id} ({timestamp()})")
             print("-----------------------------------------------------")
             
-            tiling.filter_colonies_by_score(tiles, threshold=score, detections_key="colonies", 
-                                            score_regression=score_regression)
+            filter_by_score(plate.tiles, threshold=score, score_regression=score_regression)
             
-            tiling.show_all_rois_global(plate.cropped, tiles, detections_key="colonies",
-                                        color=(0, 0, 255), thickness=2,
-                                        name=plate.sample_id, output_folder=output_path)
-            tiling.save_plate_tiles_to_csv(output_path, tiles, name=plate.sample_id)
+            render.save_json(plate, os.path.join(output_path, "predictions_json"))
+            render.show_colonies(plate, os.path.join(output_path, "predictions"))
+            
+            n = plate.count
+            counts.append((plate.sample_id, n))
+            
+            sum_writer.writerow([plate.sample_id, plate.count])
+            sum_file.flush()
+            os.fsync(sum_file.fileno())
+            
             print(f"Results saved: {plate.sample_id} ({timestamp()})")
 
-            del plate, tiles
+            del plate
             gc.collect()
+            
+        sum_file.close()
+        
+        rows = [["Plate", "Colonies"]] + [[p, str(n)] for p, n in counts]
+        col_widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
+
+        header, data_rows = rows[0], rows[1:]
+        if len(data_rows) <= 10:
+            print("RESULTS:")
+            display_rows = rows
+        else:
+            print("First 10 plates:")
+            display_rows = [header] + data_rows[:10]
+
+        for row in display_rows:
+            print("  " + "  ".join(cell.ljust(col_widths[i]) for i, cell in enumerate(row)))
+
+        print(f"Summary saved to: {sum_path}")
+        
+        
+        # merging json
+        render.merge_json(os.path.join(output_path, "predictions_json"),
+                          os.path.join(output_path, "predictions.json"))
+        shutil.rmtree(os.path.join(output_path, "predictions_json"))
 
     except Exception as e:
         print(f"ERROR: {e}")
         raise
+        
+    finally:
+        try:
+            sum_file.close()
+        except NameError:
+            pass 
 
-
+    return counts      
 # ----------------------------------------------------------------------
 # CLI
 # ----------------------------------------------------------------------
@@ -205,9 +302,9 @@ def parse_args():
             setattr(args, key, default_value)
 
     # 4. regression depends on the newly assigned or user values
-    args.regression = tiling.regression_from_score(
-        args.score, 
-        low_delta=args.ld, 
+    args.regression = regression_from_score(
+        args.score,
+        low_delta=args.ld,
         high_delta=args.hd
     )
 
@@ -239,15 +336,25 @@ def main():
             print(f"ERROR: No supported images found in folder: {args.input_path}\n"
                   f"  Supported formats: {', '.join(sorted(EXTS))}")
             sys.exit(1)
+            
+            
+    # --- Avoid writing results into the input folder ---
+    if os.path.abspath(args.input_path) == os.path.abspath(args.output_path):
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        args.output_path = os.path.join(args.output_path, f"agar3000_{stamp}")
 
     # Start logging — everything from here on is captured to the log file
     os.makedirs(args.output_path, exist_ok=True)
     tee, log_path = setup_logging(args.output_path)
+    
+    
+
 
     try:
         print(f"START: {timestamp()}")
         print("=====================================================")
-        print("Agar3000 v0.2.2")
+        print(BANNER)
+        print("                                         v0.2.3")
         print("=====================================================")
         print("Configurations:")
         print(f"  Input                   : {args.input_path}")
@@ -278,7 +385,7 @@ def main():
         print(f"Log: {log_path}")
         print("=====================================================")
 
-        run_folder_pipeline(
+        run_pipeline(
             input_path    = args.input_path,
             output_path   = args.output_path,
             model         = args.model,
@@ -297,14 +404,13 @@ def main():
         print("-----------------------------------------------------")
         print(f"FINISH: {timestamp()}")
         
-        results_path = f"{args.output_path}/RESULTS.csv"
-        summarize_colonies(args.output_path, results_path)
+
 
         if args.validation:
             import subprocess
             cmd = [
                 "Rscript", "main/validation.R",
-                "-i", f"{args.output_path}/sum.csv",
+                "-i", f"{args.output_path}/SUM.csv",
                 "-o", f"{args.output_path}/validation_report.html",
                 "-r", args.ref,
                 "-t", "main/report_template.Rmd",

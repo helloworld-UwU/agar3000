@@ -31,6 +31,7 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 
+from main.data import Colony
 
 # ImageNet/COCO mean and std in RGB order (pixel scale 0-255)
 MEAN = np.array([123.675, 116.28,  103.53], dtype=np.float32)
@@ -309,19 +310,17 @@ def detect(session, image, size=512, conf=0.25,
 
 
 def detect_on_tiles(tiles, session, size=512, conf=0.25,
-                    normalize=True, rgb=True, min_box_size=MIN_BOX_SIZE,
-                    out_key="colonies"):
+                    normalize=True, rgb=True, min_box_size=MIN_BOX_SIZE):
     """
     Run detection on each tile and map results back to original image coords.
     Identical contract to the TorchScript version - only 'model' -> 'session'.
     """
     total = len(tiles)
-    for i, (rc, d) in enumerate(tiles.items()):
-        tile             = d["tile"]
-        x0, y0, x1_bbox, y1_bbox = d["bbox"]
-        print("[tile] {}/{}  rc={})".format(
-            i + 1, total, rc), end="")
-
+    for i, (rc, t) in enumerate(tiles.items()):
+        tile = t.image
+        x0, y0, _, _ = t.bbox
+        print("[tile] {}/{}  rc={})".format(i + 1, total, rc), end="")
+    
         detections, _ = detect(
             session, tile,
             size=size, conf=conf,
@@ -329,23 +328,21 @@ def detect_on_tiles(tiles, session, size=512, conf=0.25,
             min_box_size=min_box_size,
             verbose=False,
         )
-
-        dets = []
-        for det in detections:
-            tx1, ty1, tx2, ty2 = det["x1"], det["y1"], det["x2"], det["y2"]
-            roi        = (int(ty1), int(tx1), int(ty2), int(tx2))
-            roi_global = (roi[0] + y0, roi[1] + x0,
-                          roi[2] + y0, roi[3] + x0)
-            dets.append({
-                "roi":        roi,
-                "roi_global": roi_global,
-                "score":      det["score"],
-                "label":      det["label"],
-            })
-
-        print(" -> {} detection(s)".format(len(dets)))
-        d[out_key] = dets
-
+    
+        t.colonies = [
+            Colony(
+                roi=(int(det["y1"]), int(det["x1"]),
+                     int(det["y2"]), int(det["x2"])),
+                roi_global=(int(det["y1"]) + y0, int(det["x1"]) + x0,
+                            int(det["y2"]) + y0, int(det["x2"]) + x0),
+                score=det["score"],
+                label=det["label"],
+            )
+            for det in detections
+        ]
+    
+        print(" -> {} detection(s)".format(len(t.colonies)))
+    
     return tiles
 
 
