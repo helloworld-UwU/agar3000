@@ -18,7 +18,7 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 
 ### Images
 1. Photos may be captured using any camera, including **a smartphone camera**.
-2. Images should be taken against a uniform background and under adequate lighting. The plate must be in sharp focus, and occupy the majority of the image (at least two-thirds of the shorter side of the image) and be in sharp focus.
+2. Images should be taken against a uniform background and under adequate lighting. The plate must be in sharp focus, and occupy the majority of the image (at least two-thirds of the shorter side of the image).
 3. Condensation, glare, and other imperfections on the plate's lid may lead to inaccurate results. The tool has some tolerance for bubbles in the media.
 4. The tool may have difficulty detecting very small colonies, colonies with complex structures, or colonies grown on unusually looking media.
 5. The recommended minimum image resolution is 2048 × 2048 pixels. Higher resolutions do not affect the results, as images are downscaled internally.
@@ -37,10 +37,10 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 
 
 ## Getting started
-agar3000 requires **python** (>v3.6) with **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+agar3000 requires **python** (>=v3.7, <=3.14.4) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ```bash
-conda create -n agar3000 python
+conda create -n my_env python=3.14.4
 conda activate agar3000
 ```
 
@@ -95,8 +95,7 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
 * `--extra`: saves intermediate processing stages as images and tables (cropped images, tiles before deduplication and tiles after deduplication). Significantly slows down inference. Recommended only for testing
 
-#### Results include:
-The output folder contains:
+#### Results:
 - an image of each plate with boxes drawn around the colonies
 - a CSV file with the annotations for each plate
 - RESULTS.csv with the number of colonies for each plate
@@ -142,9 +141,11 @@ Colonies must be at least 8 px in diameter. Actual performance may depend on sev
 
 
 **Which media count as unusual-looking?**
+
 agar3000 was tested on several media. Precision dropped on some plates with non-standard colours, such as blood agar and chocolate agar. Performance on such media may depend on colony morphology and is not guaranteed.  
 
 **What is the optimal number of colonies per plate?**
+
 We recommend 10–300 colonies per plate for good precision. However, the theoretical maximum is 1,600 colonies per plate.
 
 **How the colour depth may influence analysis?**
@@ -169,8 +170,7 @@ No. In our tests, hyper-threading slowed down inference. We recommend disabling 
 ## References
 The models were trained using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
 
-Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., and Drulis-Kawa, Z.
-“AGAR: A Microbial Colony Dataset for Deep Learning Detection” (2021).
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630,[10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
 
 Dataset source: https://agar.neurosys.com/
 
