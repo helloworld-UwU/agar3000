@@ -96,11 +96,11 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 * `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
 
 #### Results:
-- *predictions/*:an image of each plate with boxes drawn around the colonies
-- *predictions.json*: joined annotation in COCO formate for the entire batch
-- *SUM.csv*: the number of colonies per plate
-- *agar3000_[timestamp].log*: log-file
-- *extra/*: extra render, if selected (see flags above)
+- `predictions/`: an image of each plate with boxes drawn around the colonies
+- `predictions.json`: joined annotation in COCO formate for the entire batch
+- `SUM.csv`: the number of colonies per plate
+- `agar3000_[timestamp].log`: log-file
+- `extra/`: extra render, if selected (see flags above)
   
 
 For a first run, we recommend testing the tool on a single image or running the included demo:
