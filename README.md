@@ -1,4 +1,4 @@
-<img src="logo.png" alt="drawing"/>
+<img src="fig/logo.png" alt="drawing"/>
 
 **Yes, it's an AI!**
 
@@ -30,7 +30,7 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 - **NVIDIA GPUs** are supported via CUDA (with cuDNN), starting from the Maxwell architecture onwards (e.g., GTX 780 Ti, GTX 900 series and above), on both Linux and Windows systems.
 - **AMD GPUs** are supported via ROCm, starting from the Vega architecture onwards (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
-<img src="speed.png"/>
+<img src="fig/speed.png"/>
 </details>
 
 
@@ -112,7 +112,7 @@ for trans-illuminated plates:
 python agar3000.py demo_t demo_t/results
 ```    
 
-<img src="samples.png"/>
+<img src="fig/samples.png"/>
 
 ## Pipeline (TBD)
 
