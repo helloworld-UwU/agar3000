@@ -172,7 +172,7 @@ Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawl
 
 Dataset source: https://agar.neurosys.com/
 
-Computational workloads were executed using the [LEO5 high-performance computing infrastructure at the University of Innsbruck] (https://www.uibk.ac.at/en/zid/systeme/hpc-systeme/leo5/)
+Computational workloads were executed using the [LEO5 high-performance computing infrastructure at the University of Innsbruck](https://www.uibk.ac.at/en/zid/systeme/hpc-systeme/leo5/)
 
 Special thanks to @dedovskaya for sharing the model used during the early development: https://github.com/dedovskaya/CFUCounter
 
