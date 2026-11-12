@@ -1,4 +1,4 @@
-<img src="logo.png" alt="drawing"/>
+<img src="fig/logo.png" alt="drawing"/>
 
 **Yes, it's an AI!**
 
@@ -30,17 +30,17 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 - **NVIDIA GPUs** are supported via CUDA (with cuDNN), starting from the Maxwell architecture onwards (e.g., GTX 780 Ti, GTX 900 series and above), on both Linux and Windows systems.
 - **AMD GPUs** are supported via ROCm, starting from the Vega architecture onwards (e.g., RX Vega, RX 5000 series and newer), on Linux only.
 
-<img src="speed.png"/>
+<img src="fig/speed.png"/>
 </details>
 
 
 
 
 ## Getting started
-agar3000 requires **python** (>=v3.7, <=3.14.4) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+agar3000 requires **python** (>=v3.7, <=3.14.8) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ```bash
-conda create -n my_env python=3.14.4
+conda create -n agar3000 python=3.14.8
 conda activate agar3000
 ```
 
@@ -90,29 +90,30 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 
 #### Optinal flags:
 
-* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 3 and 4 in the examples below).
+* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 2 and 3 in the examples below).
 * `-b`: increases inference speed with a marginal change in counting precision. 
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
-* `--extra`: saves intermediate processing stages as images and tables (cropped images, tiles before deduplication and tiles after deduplication). Significantly slows down inference. Recommended only for testing
+* `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
 
 #### Results:
-- an image of each plate with boxes drawn around the colonies
-- a CSV file with the annotations for each plate
-- RESULTS.csv with the number of colonies for each plate
-- a log file, agar3000_[timestamp].log
+- `predictions/`: an image of each plate with  the predicted plate and colonies
+- `predictions.json`: combined annotations in COCO format for the entire batch
+- `SUM.csv`: colony count per plate
+- `agar3000_[timestamp].log`: log-file
+- `extra/`: additional renderings, if enabled (see the flags above)
   
 
 For a first run, we recommend testing the tool on a single image or running the included demo:
 
 ```bash
-python agar3000.py demo demo/results
+python agar3000.py demo/epi demo/epi/results
 ```    
 for trans-illuminated plates:
 ```bash
-python agar3000.py demo_t demo_t/results
+python agar3000.py demo/tra demo/tra/results -t
 ```    
 
-<img src="samples.png"/>
+<img src="fig/samples.png"/>
 
 ## Pipeline (TBD)
 
@@ -148,10 +149,6 @@ agar3000 was tested on several media. Precision dropped on some plates with non-
 
 We recommend 10–300 colonies per plate for good precision. However, the theoretical maximum is 1,600 colonies per plate.
 
-**How the colour depth may influence analysis?**
-TBD
-
-
 **Does hyper-threading improve inference speed?**
 
 No. In our tests, hyper-threading slowed down inference. We recommend disabling hyper-threading if this option is available for your computational setup. 
@@ -168,13 +165,14 @@ No. In our tests, hyper-threading slowed down inference. We recommend disabling 
 - **Model weights:** CC BY-NC 4.0 — non-commercial use only
 
 ## References
-The models were trained using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
 
-Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630,[10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
+The models were trained on HPC using [MMDetection](https://github.com/open-mmlab/mmdetection) and the AGAR dataset introduced in:
+
+Majchrowska, S., Pawłowski, J., Guła, G., Bonus, T., Hanas, A., Loch, A., Pawlak, A., Roszkowiak, J., Golan, T., & Drulis-Kawa, Z. (2025). **Assessing microbial colony counting: A deep learning approach with the AGAR image dataset**. *Neurocomputing*, 630. [10.1016/j.neucom.2025.129654](https://doi.org/10.1016/j.neucom.2025.129654)
 
 Dataset source: https://agar.neurosys.com/
 
-We gratefully acknowledge the authors and contributors for making this dataset publicly available.
+Computational workloads were executed using the [LEO5 high-performance computing infrastructure at the University of Innsbruck](https://www.uibk.ac.at/en/zid/systeme/hpc-systeme/leo5/)
 
 Special thanks to @dedovskaya for sharing the model used during the early development: https://github.com/dedovskaya/CFUCounter
 
