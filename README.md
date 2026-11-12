@@ -37,7 +37,7 @@ agar3000 runs on any x86-based system with **Windows or Linux** and uses up to 1
 
 
 ## Getting started
-agar3000 requires **python** (>=v3.7, <=3.14.8) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
+agar3000 requires **python** (>=v3.10, <=3.14.8) with compatible **opencv** and **onnxruntime** packages. We recommend to use environment management system such as conda for installation: https://www.anaconda.com/download/
 
 ```bash
 conda create -n agar3000 python=3.14.8
@@ -88,12 +88,13 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 * `input_path`: path to the folder with images of plates. Non-recursive: files in subfolders are not processed. Input_path can be a single image file.
 * `output_path`: path to the folder where results are saved. The folder is created if it does not exist.
 
-#### Optinal flags:
+#### Optional flags:
 
 * `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 2 and 3 in the examples below).
 * `-b`: increases inference speed with a marginal change in counting precision. 
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
 * `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
+* `--validation`: benchmarks agar3000 against ground-truth data. Requires the path to a CSV file with the ground truth. See [Validation mode](#validation-mode) for details.
 
 #### Results:
 - `predictions/`: an image of each plate with  the predicted plate and colonies
@@ -112,6 +113,31 @@ for trans-illuminated plates:
 ```bash
 python agar3000.py demo/tra demo/tra/results -t
 ```    
+
+## Validation mode
+<details>
+  <summary markdown="span">Click to expand</summary>
+
+Validation mode speeds up the search for the optimal score threshold. It provides a quick report on pipeline performance, whether after changes made during development or when benchmarking the pipeline on a new dataset. In this mode, the pipeline first detects colonies at a very low score threshold of 0.1. A sweep algorithm then evaluates thresholds from 0.1 to 0.95 in increments of 0.005 and selects the one that gives the best result. Finally, the pipeline analyses its performance at that threshold and renders an HTML report.
+
+
+### Requirements
+Provide the path to a CSV file containing ground-truth data. The file must have two named columns: `Plate` (the image name without extension; case-insensitive) and `Colonies` (the number of colonies on that plate). The performance of agar3000 is benchmarked against this ground truth.
+
+### Output
+Validation mode produces the following files:
+
+- `report.html`: a summary of the validation procedure, comprising:
+  1. the results of the sMAPE (symmetric mean absolute percentage error) calibration, showing how sMAPE depends on the score threshold;
+  2. a relative Bland-Altman plot for the optimal threshold;
+  3. a Deming regression for the optimal threshold.
+- `smape.csv`: the results of the sMAPE calibration, listing each assessed score threshold with its sMAPE value.
+- `raw_predictions.json`: the predictions before the optimal score threshold is applied.
+- `raw_sum.csv`: the colony count per plate before the optimal score threshold is applied.
+
+All other files are the same as in normal mode, but contain results obtained after the optimal score threshold found by the sweep has been applied.
+
+</details>
 
 <img src="fig/samples.png"/>
 
