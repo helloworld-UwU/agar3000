@@ -30,6 +30,8 @@ import cv2
 import csv
 import shutil
 
+# Save original working directory before changing it
+ORIG_CWD = os.getcwd()
 
 # Lockal import
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -40,7 +42,8 @@ from main.detect_frcnn_onnx import load_model, detect_on_tiles
 from main.plate import process_plate
 from main.dedup import resolve_duplicates
 from main.filtering import filter_by_score, regression_from_score
-
+import benchmark.validation as val
+from benchmark.validation_report import build_report
 
 # ----------------------------------------------------------------------
 # Logging — tees stdout to output_folder/pipeline_<timestamp>.log
@@ -79,10 +82,13 @@ def setup_logging(output_folder):
 # Pipeline
 # ----------------------------------------------------------------------
 
+
+
 def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
                         grid=(2, 2), overlap=0.2,
                         tol=5, scale=1024, score=0.25, extra=False,
-                        mem_debug=False, no_crop=False, margin = 1, score_regression=None):
+                        mem_debug=False, no_crop=False, margin = 1, 
+                        score_regression=None, validation=None):
 
      
     counts = []
@@ -106,8 +112,10 @@ def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
         os.makedirs(output_path, exist_ok=True)
         
         
-        
-        sum_path = os.path.join(output_path, "SUM.csv")
+        if validation is None:
+            sum_path = os.path.join(output_path, "SUM.csv")
+        else: 
+            sum_path = os.path.join(output_path, "raw_sum.csv")
 
         sum_file = open(sum_path, "w", newline="")
         sum_writer = csv.writer(sum_file)
@@ -207,6 +215,61 @@ def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
             
         sum_file.close()
         
+        if validation is None:
+            final_json = "prediction.json"
+        else:
+            final_json = "raw_predictions.json"
+
+        
+        # merging json
+        render.merge_json(os.path.join(output_path, "predictions_json"),
+                          os.path.join(output_path, final_json))
+        shutil.rmtree(os.path.join(output_path, "predictions_json"))
+        
+        
+        if validation is not None:
+
+            print(f"Validation started ({timestamp()})")
+            print("-----------------------------------------------------")
+
+            MIN_COUNT, MAX_COUNT = 11, 300        # inclusive ground-truth limits
+
+            PRED = os.path.join(output_path, final_json)
+            TRUTH = validation
+            FILTERED_PRED = os.path.join(output_path, "predictions.json")
+            SMAPE_CSV = os.path.join(output_path, "smape.csv")
+            REPORT_TEMPLATE = os.path.join("benchmark", "report_template.html")
+            REPORT = os.path.join(output_path, "report.html")
+            NEW_SUMMARY = os.path.join(output_path, "SUM.csv")
+
+            images_folder = (input_path if os.path.isdir(input_path)
+                             else os.path.dirname(os.path.abspath(input_path)))
+
+            ev = val.evaluate_thresholds(PRED, TRUTH,
+                                         start=0.1, stop=0.95, step=0.005,
+                                         min=MIN_COUNT, max=MAX_COUNT,
+                                         csv_path=SMAPE_CSV)
+
+            build_report(ev, REPORT, min=MIN_COUNT, max=MAX_COUNT,
+                         n_outliers=5, template_path=REPORT_TEMPLATE)
+
+            val.filter_json(PRED, FILTERED_PRED, ev["ids"])
+
+            val.render_json(json_path=FILTERED_PRED,
+                            images_folder=images_folder,
+                            output_folder=os.path.join(output_path, "predictions"))
+
+            # Names in ev are upper case; restore the original sample names
+            original = {name.upper(): name for name, _ in counts}
+            counts = [(original.get(name, name), int(n))
+                      for name, n in sorted(ev["pred"].items())]
+
+            val.save_csv(counts=dict(counts), path=NEW_SUMMARY,
+                         id_header="Plate", count_header="Colonies")
+            sum_path = NEW_SUMMARY
+        
+        
+        # make summary 
         rows = [["Plate", "Colonies"]] + [[p, str(n)] for p, n in counts]
         col_widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
 
@@ -222,13 +285,7 @@ def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
             print("  " + "  ".join(cell.ljust(col_widths[i]) for i, cell in enumerate(row)))
 
         print(f"Summary saved to: {sum_path}")
-        
-        
-        # merging json
-        render.merge_json(os.path.join(output_path, "predictions_json"),
-                          os.path.join(output_path, "predictions.json"))
-        shutil.rmtree(os.path.join(output_path, "predictions_json"))
-
+            
     except Exception as e:
         print(f"ERROR: {e}")
         raise
@@ -243,7 +300,29 @@ def run_pipeline(input_path, output_path, model="model/frcnn_norm.pt",
 # ----------------------------------------------------------------------
 # CLI
 # ----------------------------------------------------------------------
+def check_validation(path: str) -> None:
+    """Exits with an error message if path is not a non-empty UTF-8 csv text file."""
+    def fail(message):
+        print(f"error: --validation: {message}", file=sys.stderr)
+        sys.exit(2)
 
+    if not os.path.isfile(path):
+        fail(f"file not found: {path}")
+    if not path.lower().endswith(".csv"):
+        fail(f"expected a .csv file, got: {path}")
+
+    try:
+        with open(path, encoding="utf-8-sig") as f:
+            content = f.read()
+    except UnicodeDecodeError:
+        fail(f"{path} is not a UTF-8 text file")
+    except OSError as e:
+        fail(f"cannot read {path} ({e})")
+
+    if "\x00" in content:
+        fail(f"{path} contains binary data")
+    if not content.strip():
+        fail(f"{path} is empty")
 
 def parse_args():
     p = argparse.ArgumentParser(
@@ -276,13 +355,20 @@ def parse_args():
     p.add_argument("--scale",      type=int,   default=512,     help=argparse.SUPPRESS)
     p.add_argument("--score",      type=float, default=None,    help=argparse.SUPPRESS)
     p.add_argument("--mem-debug",  action="store_true",         help=argparse.SUPPRESS)
-    p.add_argument("--validation", action="store_true",         help=argparse.SUPPRESS)
-    p.add_argument("--ref",        type=str,   default="ref.csv",help=argparse.SUPPRESS)
+    p.add_argument("--validation", type=str,   default=None,    help=argparse.SUPPRESS)
     p.add_argument("--margin",     type=float, default=1,       help=argparse.SUPPRESS)
     p.add_argument("--ld",         type=float, default=None,    help=argparse.SUPPRESS)
     p.add_argument("--hd",         type=float, default=None,    help=argparse.SUPPRESS)
 
     args = p.parse_args()
+    
+    # Convert relative user paths to absolute paths using the original working directory
+    if args.input_path and not os.path.isabs(args.input_path):
+        args.input_path = os.path.abspath(os.path.join(ORIG_CWD, args.input_path))
+    if args.output_path and not os.path.isabs(args.output_path):
+        args.output_path = os.path.abspath(os.path.join(ORIG_CWD, args.output_path))
+    if args.validation and not os.path.isabs(args.validation):
+        args.validation = os.path.abspath(os.path.join(ORIG_CWD, args.validation))
 
     # 1. define the matrix of defaults based on flags (b, t)
     # Format: (has_b, has_t) -> {defaults dict}
@@ -300,6 +386,13 @@ def parse_args():
     for key, default_value in selected_defaults.items():
         if getattr(args, key) is None:
             setattr(args, key, default_value)
+            
+    # 3b. validation mode: keep every detection (score 0), no regression deltas
+    if args.validation is not None:
+        check_validation(args.validation)
+        args.score = 0.1
+        args.ld = None
+        args.hd = None
 
     # 4. regression depends on the newly assigned or user values
     args.regression = regression_from_score(
@@ -316,6 +409,7 @@ def parse_args():
 def main():
     
     args = parse_args()
+    
 
     # --- Input validation  ---
     EXTS = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
@@ -328,6 +422,11 @@ def main():
             print(f"ERROR: Unsupported file type: {args.input_path}\n"
                   f"  Supported formats: {', '.join(sorted(EXTS))}")
             sys.exit(1)
+            
+            # --- Validation check for single file ---
+        if getattr(args, 'validation', None) is not None:
+            print("ERROR: --validation requires at least 2 files, but the input is a single file.")
+            sys.exit(1)
     else:
         matches = []
         for e in (f"*{ext}" for ext in EXTS):
@@ -337,7 +436,15 @@ def main():
                   f"  Supported formats: {', '.join(sorted(EXTS))}")
             sys.exit(1)
             
-            
+     # --- Validation check for folder ---
+        if getattr(args, 'validation', None) is not None and len(matches) < 2:
+            print(f"ERROR: --validation requires at least 2 files in the folder (found {len(matches)}).")
+            sys.exit(1)       
+
+          
+    
+    
+    
     # --- Avoid writing results into the input folder ---
     if os.path.abspath(args.input_path) == os.path.abspath(args.output_path):
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -373,14 +480,14 @@ def main():
         print(f"  Grid                    : {args.rows} rows x {args.cols} cols")
         print(f"  Overlap                 : {args.overlap}")
         print(f"  Tolerance               : {args.tol}")
+        print("  --- Detection ---")
         print(f"  Scale                   : {args.scale}")
         print(f"  Min. score filter       : {args.score}")
         print(f"  Corection regression    : {args.regression}")
         
-        if args.validation:
+        if args.validation   is not None:
             print("  --- Validation ---")
             print(f"  Validation mode         : {args.validation}")
-            print(f"  Reference CSV           : {args.ref}")
         print("-----------------------------------------------------")
         print(f"Log: {log_path}")
         print("=====================================================")
@@ -398,28 +505,13 @@ def main():
             mem_debug     = args.mem_debug,
             no_crop       = args.no_crop,
             margin        = args.margin,
-            score_regression = (args.ld, args.hd)
+            score_regression = (args.ld, args.hd),
+            validation = args.validation
         )
         
         print("-----------------------------------------------------")
         print(f"FINISH: {timestamp()}")
         
-
-
-        if args.validation:
-            import subprocess
-            cmd = [
-                "Rscript", "main/validation.R",
-                "-i", f"{args.output_path}/SUM.csv",
-                "-o", f"{args.output_path}/validation_report.html",
-                "-r", args.ref,
-                "-t", "main/report_template.Rmd",
-            ]
-            try:
-                subprocess.run(cmd, check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"R script failed with exit code {e.returncode}")
-                sys.exit(1)
 
     finally:
         tee.close()

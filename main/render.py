@@ -174,8 +174,11 @@ def save_json(plate, output_folder, name=None, indent=2):
     of the ORIGINAL image, which is the coordinate space Colony.roi_global
     already lives in.
 
-    The only non-standard key is "score", the detector confidence, carried
-    per annotation.
+    Non-standard keys:
+      annotation["score"]  : detector confidence.
+      image["crop_bbox"]   : plate crop rectangle [x, y, width, height] in
+                             original-image coordinates, or null if the plate
+                             was not cropped (no_crop mode).
 
     Parameters
     ----------
@@ -190,7 +193,7 @@ def save_json(plate, output_folder, name=None, indent=2):
     """
     # COCO category table; single class, ids are 1-based
     COCO_CATEGORIES = [{"id": 1, "name": "colony", "supercategory": "microbe"}]
-    
+
     if plate.image is None:
         raise ValueError(f"Plate '{plate.sample_id}' has no image.")
 
@@ -200,6 +203,13 @@ def save_json(plate, output_folder, name=None, indent=2):
     img_h, img_w = plate.image.shape[:2]
     image_id = 1
 
+    # crop_bbox is stored as (x1, y1, x2, y2); COCO style is [x, y, w, h]
+    if plate.crop_bbox is not None:
+        cx1, cy1, cx2, cy2 = plate.crop_bbox
+        crop_bbox = [int(cx1), int(cy1), int(cx2 - cx1), int(cy2 - cy1)]
+    else:
+        crop_bbox = None
+
     coco = {
         "images": [{
             "id": image_id,
@@ -207,6 +217,7 @@ def save_json(plate, output_folder, name=None, indent=2):
                          else f"{plate.sample_id}.jpg",
             "width": int(img_w),
             "height": int(img_h),
+            "crop_bbox": crop_bbox,
         }],
         "annotations": [],
         "categories": COCO_CATEGORIES,
@@ -343,7 +354,7 @@ def merge_json(json_folder, output_path="prediction.json", indent=2, verbose=Fal
 
     return out_abs
 
-def show_colonies(self, output_folder, name=None, ext=".jpg",
+def show_colonies(plate, output_folder, name=None, ext=".jpg",
                   color=(0, 0, 255), thickness=2,
                   show_scores=True, font_scale=0.4, font_thickness=1,
                   show_plate=True, plate_color=(0, 255, 0)):
@@ -368,14 +379,14 @@ def show_colonies(self, output_folder, name=None, ext=".jpg",
     -------
     path : str  Full path of the written file.
     """
-    if self.image is None:
-        raise ValueError(f"Plate '{self.sample_id}' has no image.")
+    if plate.image is None:
+        raise ValueError(f"Plate '{plate.sample_id}' has no image.")
 
-    out = self.image.copy()
+    out = plate.image.copy()
 
     # -- detected plate: crop rectangle + inscribed mask circle -----------
-    if show_plate and self.crop_bbox is not None:
-        px1, py1, px2, py2 = self.crop_bbox
+    if show_plate and plate.crop_bbox is not None:
+        px1, py1, px2, py2 = plate.crop_bbox
         cv2.rectangle(out, (px1, py1), (px2, py2), plate_color, thickness)
         cv2.circle(out,
                    ((px1 + px2) // 2, (py1 + py2) // 2),
@@ -383,7 +394,7 @@ def show_colonies(self, output_folder, name=None, ext=".jpg",
                    plate_color, thickness)
 
     # -- colonies ----------------------------------------------------------
-    for t in self.tiles.values():
+    for t in plate.tiles.values():
         for col in t.colonies:
             y1, x1, y2, x2 = col.roi_global
             cv2.rectangle(out, (x1, y1), (x2, y2), color, thickness)
@@ -400,6 +411,6 @@ def show_colonies(self, output_folder, name=None, ext=".jpg",
                             (255, 255, 255), font_thickness, cv2.LINE_AA)
 
     os.makedirs(output_folder, exist_ok=True)
-    path = os.path.join(output_folder, f"{name or self.sample_id}{ext}")
+    path = os.path.join(output_folder, f"{name or plate.sample_id}{ext}")
     cv2.imwrite(path, out, [cv2.IMWRITE_JPEG_QUALITY, 95])
     return path

@@ -199,12 +199,20 @@ def find_circle_mask(img, margin=MARGIN, detect_size=512):
     return plate_mask, bbox
 
 
-def apply_circular_mask(target_img, mask, bbox):
-    """Zero-out outside the circle mask, then crop to the bounding box."""
-    masked_img = cv2.bitwise_and(target_img, target_img, mask=mask)
+def apply_circular_mask(target_img, mask, bbox, apply_mask: bool = True):
+    """
+    Crops target_img to the bounding box. Always returns (cropped_img, cropped_mask).
+
+    apply_mask=True  : zero-out outside the circle mask, then crop.
+    apply_mask=False : crop only; the image is not masked.
+    """
     x1, y1, x2, y2 = bbox
-    cropped_img = masked_img[y1:y2, x1:x2]
-    cropped_mask = mask[y1:y2, x1:x2]
+
+    if apply_mask:
+        target_img = cv2.bitwise_and(target_img, target_img, mask=mask)
+
+    cropped_img = target_img[y1:y2, x1:x2]
+    cropped_mask = mask[y1:y2, x1:x2] if mask is not None else None
     return cropped_img, cropped_mask
 
 

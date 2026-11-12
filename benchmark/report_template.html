@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>$title</title>
+<style>
+  :root { --bg:#ffffff; --fg:#1f2328; --muted:#656d76; --line:#d0d7de; --card:#f6f8fa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e; --line:#30363d; --card:#161b22; }
+  }
+  body { background:var(--bg); color:var(--fg); font-family:system-ui,sans-serif;
+         max-width:960px; margin:2rem auto; padding:0 1rem; line-height:1.5; }
+  h1 { margin-bottom:0.2rem; }
+  h2 { border-bottom:1px solid var(--line); padding-bottom:0.3rem; margin-top:2.5rem; }
+  .muted { color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:0.8rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:6px; padding:0.7rem 0.9rem; }
+  .card .label { color:var(--muted); font-size:0.8rem; }
+  .card .value { font-size:1.4rem; font-weight:600; }
+  img { max-width:100%; height:auto; background:#fff; border:1px solid var(--line); border-radius:6px; }
+  table { border-collapse:collapse; width:100%; margin:0.5rem 0 1rem; font-size:0.9rem; }
+  th, td { border-bottom:1px solid var(--line); padding:0.35rem 0.6rem; text-align:right; }
+  th:first-child, td:first-child { text-align:left; }
+  .two { display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:1rem; }
+</style>
+</head>
+<body>
+
+<h1>$title</h1>
+<p class="muted">Generated $generated</p>
+
+<h2>Summary</h2>
+<div class="grid">
+  <div class="card"><div class="label">Best threshold</div><div class="value">$best_threshold</div></div>
+  <div class="card"><div class="label">sMAPE</div><div class="value">$best_smape</div></div>
+  <div class="card"><div class="label">Matched samples</div><div class="value">$matched</div></div>
+  <div class="card"><div class="label">Used in calculation</div><div class="value">$used</div></div>
+</div>
+<p class="muted">
+  Ground-truth counts included: $min to $max (inclusive)
+</p>
+
+<h2>sMAPE against score threshold</h2>
+<p>$smape_svg</p>
+
+<h2>Relative Bland-Altman plot (for the optimal threshold)</h2>
+<div class="grid">
+  <div class="card"><div class="label">Bias</div><div class="value">$ba_bias %</div></div>
+  <div class="card"><div class="label">Lower limit</div><div class="value">$ba_lower %</div></div>
+  <div class="card"><div class="label">Upper limit</div><div class="value">$ba_upper %</div></div>
+</div>
+<p>$ba_svg</p>
+<p class="muted">Hover over a point to see the sample name.</p>
+<div class="two">
+  <div><h3>Over-counted (above the bias)</h3>$ba_above_table</div>
+  <div><h3>Under-counted (below the bias)</h3>$ba_below_table</div>
+</div>
+
+<h2>Deming regression (for the optimal threshold)</h2>
+<div class="grid">
+  <div class="card"><div class="label">Slope</div><div class="value">$dm_slope</div></div>
+  <div class="card"><div class="label">Intercept (colonies)</div><div class="value">$dm_intercept</div></div>
+  <div class="card"><div class="label">Delta</div><div class="value">$delta</div></div>
+</div>
+<p>$deming_svg</p>
+<div class="two">
+  <div><h3>Over-counted (above the line)</h3>$dm_above_table</div>
+  <div><h3>Under-counted (below the line)</h3>$dm_below_table</div>
+</div>
+
+</body>
+</html>
