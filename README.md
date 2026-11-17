@@ -11,6 +11,7 @@ Take a photo with your smartphone and let agar3000 prove you wrong.
 - No fine-tuning  or supervision required. Just an input path with your images and an output path for the results
 - It can analyse up to 20 images per minute in CPU-only mode and up to 65 with GPU acceleration.
 
+<img src="fig/samples.png"/>
 
 ## Requirements
 <details>
@@ -139,7 +140,7 @@ All other files are the same as in normal mode, but contain results obtained aft
 
 </details>
 
-<img src="fig/samples.png"/>
+
 
 ## Pipeline (TBD)
 
