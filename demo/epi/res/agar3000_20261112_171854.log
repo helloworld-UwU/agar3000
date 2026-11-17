@@ -1,0 +1,128 @@
+START: 2026-11-12 17:18:54
+=====================================================
+
+ █████╗   ██████╗  █████╗ ██████╗
+██╔══██╗ ██╔════╝ ██╔══██╗██╔══██╗
+███████║ ██║  ███╗███████║██████╔╝
+██╔══██║ ██║   ██║██╔══██║██╔══██╗
+██║  ██║ ╚██████╔╝██║  ██║██║  ██║
+╚═╝  ╚═╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+
+ ██████╗  ██████╗  ██████╗  ██████╗
+ ╔═══██╝ ██╔═████╗██╔═████╗██╔═████╗
+ █████╗  ██║██╔██║██║██╔██║██║██╔██║
+ ╚═══██╗ ████╔╝██║████╔╝██║████╔╝██║
+██████╔╝ ╚██████╔╝╚██████╔╝╚██████╔╝
+╚═════╝   ╚═════╝  ╚═════╝  ╚═════╝
+
+                                         v0.2.3
+=====================================================
+Configurations:
+  Input                   : C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4r\demo\epi
+  Output folder           : C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4r\demo\epi\res
+  Mode                    : Epi-illumination
+  Model                   : model/frcnn_lr.onnx
+  Extra output            : False
+  --- Cropping ---
+  Plate margin offset : 1
+  --- Tiling ---
+  Grid                    : 3 rows x 3 cols
+  Overlap                 : 0.1
+  Tolerance               : 3
+  --- Detection ---
+  Scale                   : 512
+  Min. score filter       : 0.1
+  Corection regression    : None
+  --- Validation ---
+  Validation mode         : C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4\demo\ref.csv
+-----------------------------------------------------
+Log: C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4r\demo\epi\res\agar3000_20261112_171854.log
+=====================================================
+[INFO] Available ORT providers : ['Azure', 'CPU']
+[INFO] Loading model           : model/frcnn_lr.onnx
+[INFO] Active device           : CPU
+[INFO] ORT threads             : 4
+[INFO] Session provider        : CPU
+-----------------------------------------------------
+-----------------------------------------------------
+PROCESSING: demo1.jpg (2026-11-12 17:18:56)
+-----------------------------------------------------
+Detection started:  demo1 (2026-11-12 17:18:57)
+[tile] 1/9  rc=(0, 0)) -> 32 detection(s)
+[tile] 2/9  rc=(0, 1)) -> 35 detection(s)
+[tile] 3/9  rc=(0, 2)) -> 19 detection(s)
+[tile] 4/9  rc=(1, 0)) -> 56 detection(s)
+[tile] 5/9  rc=(1, 1)) -> 68 detection(s)
+[tile] 6/9  rc=(1, 2)) -> 43 detection(s)
+[tile] 7/9  rc=(2, 0)) -> 29 detection(s)
+[tile] 8/9  rc=(2, 1)) -> 52 detection(s)
+[tile] 9/9  rc=(2, 2)) -> 30 detection(s)
+Detection finished: demo1 (2026-11-12 17:19:23)
+-----------------------------------------------------
+Deduplication started:  demo1 (2026-11-12 17:19:23)
+Tile pairs processed: 12
+dropped=119, merged=3
+Deduplication finished: demo1 (2026-11-12 17:19:23)
+-----------------------------------------------------
+Results saved: demo1 (2026-11-12 17:19:23)
+-----------------------------------------------------
+-----------------------------------------------------
+PROCESSING: demo2.jpg (2026-11-12 17:19:23)
+-----------------------------------------------------
+Detection started:  demo2 (2026-11-12 17:19:24)
+[tile] 1/9  rc=(0, 0)) -> 5 detection(s)
+[tile] 2/9  rc=(0, 1)) -> 5 detection(s)
+[tile] 3/9  rc=(0, 2)) -> 3 detection(s)
+[tile] 4/9  rc=(1, 0)) -> 10 detection(s)
+[tile] 5/9  rc=(1, 1)) -> 12 detection(s)
+[tile] 6/9  rc=(1, 2)) -> 10 detection(s)
+[tile] 7/9  rc=(2, 0)) -> 5 detection(s)
+[tile] 8/9  rc=(2, 1)) -> 9 detection(s)
+[tile] 9/9  rc=(2, 2)) -> 5 detection(s)
+Detection finished: demo2 (2026-11-12 17:19:58)
+-----------------------------------------------------
+Deduplication started:  demo2 (2026-11-12 17:19:58)
+Tile pairs processed: 12
+dropped=15, merged=6
+Deduplication finished: demo2 (2026-11-12 17:19:58)
+-----------------------------------------------------
+Results saved: demo2 (2026-11-12 17:19:58)
+-----------------------------------------------------
+-----------------------------------------------------
+PROCESSING: demo3.jpg (2026-11-12 17:19:58)
+-----------------------------------------------------
+Detection started:  demo3 (2026-11-12 17:19:59)
+[tile] 1/9  rc=(0, 0)) -> 13 detection(s)
+[tile] 2/9  rc=(0, 1)) -> 17 detection(s)
+[tile] 3/9  rc=(0, 2)) -> 3 detection(s)
+[tile] 4/9  rc=(1, 0)) -> 22 detection(s)
+[tile] 5/9  rc=(1, 1)) -> 24 detection(s)
+[tile] 6/9  rc=(1, 2)) -> 10 detection(s)
+[tile] 7/9  rc=(2, 0)) -> 8 detection(s)
+[tile] 8/9  rc=(2, 1)) -> 23 detection(s)
+[tile] 9/9  rc=(2, 2)) -> 7 detection(s)
+Detection finished: demo3 (2026-11-12 17:20:20)
+-----------------------------------------------------
+Deduplication started:  demo3 (2026-11-12 17:20:20)
+Tile pairs processed: 12
+dropped=34, merged=0
+Deduplication finished: demo3 (2026-11-12 17:20:20)
+-----------------------------------------------------
+Results saved: demo3 (2026-11-12 17:20:21)
+Validation started (2026-11-12 17:20:21)
+-----------------------------------------------------
+Matched samples: 3 (truth: 3, predictions: 3)
+Used in calculation: 3
+Best threshold: 0.215
+Best sMAPE: 0.00
+Report written: C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4r\demo\epi\res\report.html
+Annotations kept: 340 of 378
+Images written: 3 of 3
+RESULTS:
+  Plate  Colonies
+  demo1  215     
+  demo2  41      
+  demo3  84      
+Summary saved to: C:\Users\Admin\Desktop\UNI\RinkeLAB\agar3000\agar3000_v0.2.4r\demo\epi\res\SUM.csv
+-----------------------------------------------------
+FINISH: 2026-11-12 17:20:22
