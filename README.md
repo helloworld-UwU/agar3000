@@ -91,7 +91,7 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 
 #### Optional flags:
 
-* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates (see images 2 and 3 in the examples below).
+* `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates.
 * `-b`: increases inference speed with a marginal change in counting precision. 
 * `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
 * `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
