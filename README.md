@@ -81,7 +81,7 @@ For other versions of CUDA and ROCm see corresponding compatibility tables:
 ## Workflow
 
 ```bash
-python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra] 
+python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra] [--validation]
 ```
 
 #### Main arguments:
