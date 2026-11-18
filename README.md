@@ -93,8 +93,8 @@ python agar3000.py input_path output_path [-t] [-b] [-h] [--no-crop] [--extra]
 
 * `-t`: trans-illumination mode. Uses a different model trained to detect colonies on trans-illuminated plates.
 * `-b`: increases inference speed with a marginal change in counting precision. 
-* `--no-crop`: skips image cropping. Useful if cropping fails or the plates are not circular.
-* `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). Significantly slows down inference. Recommended only for testing
+* `--no-crop`: skips image plate detection. Useful if plate detection fails or the plates are not circular.
+* `--extra`: renders intermediate processing stages as images and tables (cropping/tiling geometry, tiles before and after deduplication, joined image before filtering). **Significantly slows down inference!** Recommended only for testing
 * `--validation`: benchmarks agar3000 against ground-truth data. Requires the path to a CSV file with the ground truth. See [Validation mode](#validation-mode) for details.
 
 #### Results:
